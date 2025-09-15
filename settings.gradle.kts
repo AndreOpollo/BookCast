@@ -23,3 +23,4 @@ rootProject.name = "Book Cast"
 include(":app")
 include(":auth")
 include(":home")
+include(":details")
