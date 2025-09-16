@@ -20,6 +20,7 @@
             <option value="$PROJECT_DIR$/favorites" />
             <option value="$PROJECT_DIR$/genres" />
             <option value="$PROJECT_DIR$/home" />
+            <option value="$PROJECT_DIR$/player" />
             <option value="$PROJECT_DIR$/search" />
           </set>
         </option>
