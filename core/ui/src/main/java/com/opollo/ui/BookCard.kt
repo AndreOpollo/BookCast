@@ -30,6 +30,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -124,4 +125,20 @@ fun BookCard(
 
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun BookCardPreview(){
+    val book = Book(1, "The Alchemist", "Paulo Coelho",
+        "https://picsum.photos/seed/reco1/300/450")
+
+    BookCard(
+        book,
+        isFavorite =false,
+        onCardClick = {},
+        onFavoriteToggle = {},
+        currentChapter = 20,
+        totalChapters = 25
+    )
 }
