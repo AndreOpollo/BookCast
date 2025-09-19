@@ -22,7 +22,8 @@ fun BookWithAuthors.toDomain(): Book {
         totalTime = book.totalTime,
         totalTimeSecs = book.totalTimeSecs,
         urlRss =book.urlRss,
-        urlZipFile = book.urlZipFile
+        urlZipFile = book.urlZipFile,
+        coverArt = book.coverArt
     )
 }
 
@@ -46,7 +47,8 @@ fun BookDto.toEntity(genre:String?): BookEntity{
         totalTimeSecs,
         urlRss,
         urlZipFile,
-        genre = genre
+        genre = genre,
+        coverArt
     )
 }
 

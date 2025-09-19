@@ -4,8 +4,13 @@ import android.content.Context
 import androidx.activity.contextaware.ContextAware
 import androidx.room.Room
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import com.opollo.data.local.dao.AuthorDao
+import com.opollo.data.local.dao.BookAuthorDao
+import com.opollo.data.local.dao.BookDao
 import com.opollo.data.local.db.BookDatabase
 import com.opollo.data.remote.api.BooksApiService
+import com.opollo.data.repository.BookRepositoryImpl
+import com.opollo.domain.repository.BookRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -44,6 +49,7 @@ object DataModule {
         val contentType = "application/json".toMediaType()
         val json = Json {
             ignoreUnknownKeys = true
+            coerceInputValues = true
         }
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
@@ -100,4 +106,18 @@ object DataModule {
     @Provides
     @Singleton
     fun provideBookAuthorDao(db: BookDatabase) = db.bookAuthorDao()
+
+    @Provides
+    @Singleton
+    fun provideBookRepository(@JsonRetrofit apiService: BooksApiService,
+                              bookDao: BookDao,
+                              authorDao: AuthorDao,
+                              bookAuthorDao: BookAuthorDao): BookRepository{
+        return BookRepositoryImpl(
+            apiService,
+            bookDao,
+            authorDao,
+            bookAuthorDao
+        )
+    }
 }

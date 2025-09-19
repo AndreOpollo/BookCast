@@ -11,7 +11,8 @@ interface BooksApiService {
 
     @GET("/api/feed/audiobooks")
     suspend fun getBooks(
-        @Query("format") format:String = "json"
+        @Query("format") format:String = "json",
+        @Query("coverart") coverArt:String = "1"
     ): ApiResponse
 
     @GET("/api/feed/audiobooks")

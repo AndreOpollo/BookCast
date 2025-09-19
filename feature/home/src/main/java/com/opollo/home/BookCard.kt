@@ -1,5 +1,6 @@
 package com.opollo.home
 
+import android.R.attr.maxLines
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -30,14 +31,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.opollo.domain.model.Book
 
 @Composable
-fun BookCard(book: Book,modifier: Modifier = Modifier){
+fun BookCard(book: Book, modifier: Modifier = Modifier){
     Column(
         modifier = modifier.width(140.dp)
     ){
         AsyncImage(model = ImageRequest.Builder(LocalContext.current)
-            .data(book.imageUrl)
+            .data(book.coverArt)
             .crossfade(true)
             .build(),
             contentDescription = book.title,
@@ -56,7 +58,7 @@ fun BookCard(book: Book,modifier: Modifier = Modifier){
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = book.author,
+            text = "${book.authors.firstOrNull()?.firstName} ${book.authors.firstOrNull()?.lastName}",
             style = MaterialTheme.typography.bodyMedium,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
@@ -90,7 +92,7 @@ fun CurrentlyReadingBookCard(data: CurrentlyReadingBook){
 @Composable
 fun BookSection(
     title:String,
-    items:List<*>,
+    items:List<Book>,
     modifier: Modifier = Modifier
 ){
     Text(
@@ -116,34 +118,4 @@ fun BookSection(
 @Preview(showBackground = true)
 @Composable
 fun BookCardPreview(){
-    val placeholder = Book(
-        id = 1,
-        title = "The Great Gatsby",
-        author = "F. Scott Fitzgerald",
-        imageUrl = ""
-    )
-
-    Column(
-        modifier = Modifier.width(140.dp)
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.book_cover), // <-- Using local drawable
-            contentDescription = placeholder.title,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(3f / 4f)
-                .clip(MaterialTheme.shapes.medium)
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = placeholder.title,
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.SemiBold
-        )
-        Text(
-            text = placeholder.author,
-            style = MaterialTheme.typography.bodyMedium
-        )
-    }
 }

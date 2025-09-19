@@ -15,5 +15,6 @@ data class BookEntity(
     val totalTimeSecs: Int,
     val urlRss: String,
     val urlZipFile: String,
-    val genre:String? = null
+    val genre:String? = null,
+    val coverArt:String
 )

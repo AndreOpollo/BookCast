@@ -1,5 +1,6 @@
 package com.opollo.domain.model
 
+
 import kotlinx.serialization.Serializable
 
 
@@ -15,7 +16,8 @@ data class Book(
     val totalTime:String,
     val totalTimeSecs:Int,
     val urlRss:String,
-    val urlZipFile: String
+    val urlZipFile: String,
+    val coverArt:String
 )
 
 @Serializable

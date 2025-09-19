@@ -1,6 +1,7 @@
 package com.opollo.data.repository
 
 
+import com.opollo.data.di.JsonRetrofit
 import com.opollo.data.local.dao.AuthorDao
 import com.opollo.data.local.dao.BookAuthorDao
 import com.opollo.data.local.dao.BookDao
@@ -20,9 +21,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import okhttp3.Dispatcher
+import javax.inject.Inject
 
-class BookRepositoryImpl(
-    private val apiService: BooksApiService,
+class BookRepositoryImpl @Inject constructor(
+    @JsonRetrofit private val apiService: BooksApiService,
     private val bookDao: BookDao,
     private val authorDao: AuthorDao,
     private val bookAuthorDao: BookAuthorDao

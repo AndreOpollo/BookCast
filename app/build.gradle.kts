@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
 
 }
 
@@ -64,5 +66,7 @@ dependencies {
     implementation(project(":feature:home"))
     implementation(project(":feature:discover"))
     implementation(project(":feature:favorites"))
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
 
 }

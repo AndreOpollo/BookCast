@@ -42,6 +42,6 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(libs.kotlinx.serialization.core)
-//    implementation(libs.androidx.annotation.experimental)
+    implementation(libs.androidx.annotation.experimental)
 
 }
