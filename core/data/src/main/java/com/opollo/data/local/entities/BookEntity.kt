@@ -9,6 +9,7 @@ data class BookEntity(
     val title:String,
     val description:String,
     val copyrightYear: String,
+    val language:String,
     val numSections: String,
     val totalTime: String,
     val totalTimeSecs: Int,

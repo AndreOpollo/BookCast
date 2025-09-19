@@ -2,12 +2,10 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.ksp)
-    alias(libs.plugins.hilt)
 }
 
 android {
-    namespace = "com.opollo.data"
+    namespace = "com.opollo.domain"
     compileSdk = 36
 
     defaultConfig {
@@ -43,16 +41,7 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    implementation(libs.retrofit)
-    implementation(libs.retrofit2.kotlinx.serialization.converter)
     implementation(libs.kotlinx.serialization.core)
-    implementation(libs.okhttp)
-    implementation(libs.logging.interceptor)
 //    implementation(libs.androidx.annotation.experimental)
-    implementation(libs.converter.simplexml)
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.android.compiler)
-    implementation(libs.room)
-    ksp(libs.room.compiler)
-    implementation(project(":core:domain"))
+
 }

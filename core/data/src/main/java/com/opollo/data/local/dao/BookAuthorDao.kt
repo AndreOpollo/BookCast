@@ -15,8 +15,16 @@ interface BookAuthorDao {
     suspend fun getBookWithAuthors(bookId:String): BookWithAuthors?
 
     @Transaction
+    @Query("SELECT * FROM books WHERE title = :title")
+    suspend fun getBookWithAuthorsByTitle(title:String): BookWithAuthors?
+
+    @Transaction
     @Query("SELECT * FROM books ORDER BY title ASC")
     suspend fun getAllBooksWithAuthors():List<BookWithAuthors>
+
+    @Transaction
+    @Query("SELECT * FROM books WHERE genre=:genre ORDER BY title ASC")
+    suspend fun getAllBooksWithAuthorsByGenre(genre:String):List<BookWithAuthors>
 
     @Upsert
     suspend fun insertBookAuthorCrossRef(crossRefs: List<BookAuthorCrossRef>)

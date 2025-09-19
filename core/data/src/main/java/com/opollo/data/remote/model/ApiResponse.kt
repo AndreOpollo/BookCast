@@ -1,22 +1,23 @@
 package com.opollo.data.remote.model
 
 
+
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class ApiResponse(
-    val books: List<Book>
+    val books: List<BookDto>
 )
 
 
 @Serializable
-data class Book(
+data class BookDto(
     val id:String,
     val title:String,
     val description:String,
     val language: String,
-    val authors:List<Author>,
+    val authors:List<AuthorDto>,
     @SerialName("copyright_year")
     val copyrightYear:String,
     @SerialName("num_sections")
@@ -30,8 +31,8 @@ data class Book(
 )
 
 @Serializable
-data class Author(
-    val id:Int,
+data class AuthorDto(
+    val id:String,
     @SerialName("first_name")
     val firstName:String,
     @SerialName("last_name")

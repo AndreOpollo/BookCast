@@ -18,19 +18,19 @@ interface BooksApiService {
     suspend fun getBookById(
         @Query(value = "id") id:String,
         @Query("format") format:String = "json"
-    )
+    ): ApiResponse
 
     @GET("/api/feed/audiobooks")
     suspend fun getBookByTitle(
         @Query("title") title:String,
         @Query("format") format: String = "json"
-    )
+    ): ApiResponse
 
     @GET("/api/feed/audiobooks")
     suspend fun getBooksByGenre(
         @Query("genre") genre:String,
         @Query("format") format:String = "json"
-    )
+    ): ApiResponse
 
     @GET
     suspend fun getBookChapters(@Url rssUrl:String): RssFeed
