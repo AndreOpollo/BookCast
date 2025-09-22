@@ -110,11 +110,13 @@ object DataModule {
     @Provides
     @Singleton
     fun provideBookRepository(@JsonRetrofit apiService: BooksApiService,
+                              @XmlRetrofit api: BooksApiService,
                               bookDao: BookDao,
                               authorDao: AuthorDao,
                               bookAuthorDao: BookAuthorDao): BookRepository{
         return BookRepositoryImpl(
             apiService,
+            api,
             bookDao,
             authorDao,
             bookAuthorDao

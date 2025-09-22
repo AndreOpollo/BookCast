@@ -26,3 +26,11 @@ data class Author(
     val firstName:String,
     val lastName:String
 )
+
+@Serializable
+data class Chapter(
+    val title:String,
+    val audioUrl:String,
+    val duration:String,
+    val chapterNumber:Int
+)

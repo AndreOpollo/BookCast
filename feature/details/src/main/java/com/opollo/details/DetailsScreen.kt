@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.MenuBook
@@ -28,6 +29,7 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -37,6 +39,8 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -54,15 +58,27 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.text.HtmlCompat
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.opollo.domain.model.Book
+import com.opollo.domain.model.Chapter
 
 @Composable
 fun DetailsScreen(book: Book,
-                  onBackPressed:()->Unit){
+                  onBackPressed:()->Unit,
+                  viewModel: DetailsViewModel = hiltViewModel()
+){
     var isFavorite by remember { mutableStateOf(false) }
     var selectedTab by remember { mutableStateOf("Overview") }
+    val state by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(selectedTab,book.urlRss) {
+        if(selectedTab == "Chapters" && book.urlRss.isNotEmpty()){
+            viewModel.getBookChapters(book.urlRss)
+        }
+
+    }
     LazyColumn(
         modifier = Modifier.fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
@@ -215,19 +231,57 @@ fun DetailsScreen(book: Book,
                         )
                     }
                     "Chapters"->{
-                        Text(
-                            text = "Chapter list would be displayed here.",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.fillMaxWidth(),
-                            textAlign = TextAlign.Center
-                        )
+                        ChapterList(chapters = state.chapters)
                     }
                 }
             }
 
         }
     }
+}
+
+@Composable
+fun ChapterList(chapters:List<Chapter>){
+    Column {
+        chapters.forEach{chapter->
+            ChapterItem(chapter, onClick = {})
+        }
+    }
+
+}
+
+@Composable
+fun ChapterItem(chapter: Chapter,
+                onClick: () -> Unit){
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+    ){
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ){
+            Text(
+                text = "Chapter ${chapter.chapterNumber}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Text(
+                text = chapter.title,
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+            Text(
+                text = chapter.duration,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+
+        }
+
+    }
+
 }
 
 @Composable

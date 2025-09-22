@@ -2,6 +2,7 @@ package com.opollo.data.repository
 
 
 import com.opollo.data.di.JsonRetrofit
+import com.opollo.data.di.XmlRetrofit
 import com.opollo.data.local.dao.AuthorDao
 import com.opollo.data.local.dao.BookAuthorDao
 import com.opollo.data.local.dao.BookDao
@@ -14,6 +15,7 @@ import com.opollo.data.remote.api.BooksApiService
 import com.opollo.data.remote.model.ApiResponse
 import com.opollo.data.remote.model.AuthorDto
 import com.opollo.domain.model.Book
+import com.opollo.domain.model.Chapter
 import com.opollo.domain.repository.BookRepository
 import com.opollo.domain.util.Resource
 import kotlinx.coroutines.Dispatchers
@@ -25,6 +27,7 @@ import javax.inject.Inject
 
 class BookRepositoryImpl @Inject constructor(
     @JsonRetrofit private val apiService: BooksApiService,
+    @XmlRetrofit private val api: BooksApiService,
     private val bookDao: BookDao,
     private val authorDao: AuthorDao,
     private val bookAuthorDao: BookAuthorDao
@@ -50,7 +53,6 @@ class BookRepositoryImpl @Inject constructor(
                     emit(Resource.Error(e))
 
                 }
-
             }
         }
 
@@ -102,7 +104,7 @@ class BookRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getBookByTitle(title: String,fetchFromRemote: Boolean): Flow<Resource<Book?>> =         withContext(Dispatchers.IO) {
+    override suspend fun getBookByTitle(title: String,fetchFromRemote: Boolean): Flow<Resource<Book?>> =  withContext(Dispatchers.IO) {
         flow {
             emit(Resource.Loading)
             try {
@@ -120,6 +122,30 @@ class BookRepositoryImpl @Inject constructor(
                 emit(Resource.Error(e))
             }
         }
+    }
+
+    override suspend fun getBookChapters(rssUrl: String): Flow<Resource<List<Chapter>>> = withContext(
+        Dispatchers.IO) {
+        flow {
+            emit(Resource.Loading)
+            try {
+                val rssFeed = api.getBookChapters(rssUrl)
+                val chapters = rssFeed.items.map {
+                    item->
+                    Chapter(
+                        title = item.title,
+                        audioUrl = item.audioUrl,
+                        duration = item.duration,
+                        chapterNumber = item.episodeNumber
+                    )
+                }
+                emit(Resource.Success(chapters))
+
+            }catch (e: Exception){
+                emit(Resource.Error(e))
+            }
+        }
+
     }
 
 
