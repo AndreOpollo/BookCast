@@ -51,5 +51,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     implementation(libs.material.icons.extended)
     implementation(libs.coil.compose)
+    implementation(project(":core:domain"))
 
 }

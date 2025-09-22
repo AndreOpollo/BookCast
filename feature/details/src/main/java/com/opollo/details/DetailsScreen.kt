@@ -48,15 +48,19 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.text.HtmlCompat
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.opollo.domain.model.Book
 
 @Composable
-fun DetailsScreen(){
+fun DetailsScreen(book: Book,
+                  onBackPressed:()->Unit){
     var isFavorite by remember { mutableStateOf(false) }
     var selectedTab by remember { mutableStateOf("Overview") }
     LazyColumn(
@@ -71,7 +75,7 @@ fun DetailsScreen(){
             ) {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data("")
+                        .data(book.coverArt)
                         .crossfade(true)
                         .build(),
                     contentDescription = "Book Cover",
@@ -96,7 +100,7 @@ fun DetailsScreen(){
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = onBackPressed) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
@@ -118,14 +122,14 @@ fun DetailsScreen(){
                 .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally){
                 Text(
-                    text = "Murder in Three Acts",
+                    text = book.title,
                     style = MaterialTheme.typography.headlineLarge,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Agatha Christie",
+                    text = book.authors.joinToString(separator = ", "){"${it.firstName} ${it.lastName}"  },
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -141,7 +145,7 @@ fun DetailsScreen(){
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        "1hr 30 mins",
+                        text = formatTotalTime(book.totalTime),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -199,8 +203,12 @@ fun DetailsScreen(){
                 tab->
                 when(tab){
                     "Overview"->{
+                        val description = book.description
+                        val annotatedString = buildAnnotatedString {
+                            append(HtmlCompat.fromHtml(description, HtmlCompat.FROM_HTML_MODE_COMPACT))
+                        }
                         Text(
-                            text = "The American Minister and his family have bought the English stately home Canterville Chase, complete with the ghost of Sir Simon de Canterville - blood-stains, clanking chains and all. But these modern Americans will have no truck with ghostly goings-on, and set out to beat the spectre at his own game. (Summary by David Barnes)",
+                            text = annotatedString,
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             lineHeight = MaterialTheme.typography.bodyLarge.lineHeight * 1.5
@@ -232,8 +240,21 @@ fun TabButton(text:String,isSelected:Boolean,onClick:()->Unit){
     }
 }
 
+private fun formatTotalTime(time:String):String{
+    val parts = time.split(":")
+
+    if(parts.size<2) return time
+
+    return when(parts.size){
+        3->"${parts[0]} hrs  ${parts[1]} mins ${parts[2]} s"
+        2->"${parts[0]} hrs ${parts[1]} mins"
+        else -> time
+    }
+
+}
+
 @Preview(showBackground = true)
 @Composable
 fun DetailsScreenPreview(){
-    DetailsScreen()
+
 }

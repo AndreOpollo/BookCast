@@ -9,9 +9,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.opollo.domain.model.Book
 
 @Composable
-fun Content(modifier: Modifier = Modifier,uiState: HomeUiState){
+fun Content(modifier: Modifier = Modifier,
+            uiState: HomeUiState,
+            onBookClicked:(Book)->Unit){
     LaunchedEffect(Unit) {
         Log.d("Recommended",uiState.recommendedList.toString())
     }
@@ -24,19 +27,22 @@ fun Content(modifier: Modifier = Modifier,uiState: HomeUiState){
         item {
             BookSection(
                 "Currently Reading",
-                items = emptyList()
+                items = emptyList(),
+                onBookClicked = onBookClicked
             )
         }
         item {
             BookSection(
                 "Recommended For You",
-                items = uiState.recommendedList
+                items = uiState.recommendedList,
+                onBookClicked = onBookClicked
             )
         }
         item{
             BookSection(
                 title = "New Releases",
-                items = uiState.recommendedList
+                items = uiState.recommendedList,
+                onBookClicked = onBookClicked
             )
         }
 

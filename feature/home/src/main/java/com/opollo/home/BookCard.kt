@@ -2,6 +2,7 @@ package com.opollo.home
 
 import android.R.attr.maxLines
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -34,7 +35,9 @@ import coil.request.ImageRequest
 import com.opollo.domain.model.Book
 
 @Composable
-fun BookCard(book: Book, modifier: Modifier = Modifier){
+fun BookCard(book: Book,
+             modifier: Modifier = Modifier,
+             onBookClicked:(Book)->Unit){
     Column(
         modifier = modifier.width(140.dp)
     ){
@@ -47,6 +50,7 @@ fun BookCard(book: Book, modifier: Modifier = Modifier){
             modifier = Modifier.fillMaxWidth()
                 .aspectRatio(3f/4f)
                 .clip(MaterialTheme.shapes.medium)
+                .clickable(onClick = {onBookClicked(book)})
             )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
@@ -71,7 +75,7 @@ fun CurrentlyReadingBookCard(data: CurrentlyReadingBook){
     val progress = data.currentChapter.toFloat()/data.totalChapters
 
     Column(modifier = Modifier.width(140.dp)){
-        BookCard(book = data.book)
+        BookCard(book = data.book, onBookClicked = {})
         Spacer(modifier = Modifier.height(4.dp))
         Row(
             verticalAlignment = Alignment.CenterVertically
@@ -93,7 +97,8 @@ fun CurrentlyReadingBookCard(data: CurrentlyReadingBook){
 fun BookSection(
     title:String,
     items:List<Book>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onBookClicked: (Book) -> Unit
 ){
     Text(
         text = title,
@@ -108,7 +113,7 @@ fun BookSection(
     ){
         items(items){item->
             when(item){
-                is Book -> BookCard(item)
+                is Book -> BookCard(item,onBookClicked = onBookClicked)
                 is CurrentlyReadingBook ->CurrentlyReadingBookCard(item)
             }
         }

@@ -66,6 +66,8 @@ dependencies {
     implementation(project(":feature:home"))
     implementation(project(":feature:discover"))
     implementation(project(":feature:favorites"))
+    implementation(project(":core:domain"))
+    implementation(project(":feature:details"))
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
 

@@ -21,10 +21,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.opollo.domain.model.Book
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()){
+fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(),
+               onBookClicked:(Book)->Unit){
     val state = viewModel.uiState.collectAsState()
     Scaffold(
         topBar = {
@@ -42,7 +44,9 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()){
             )
         },
         content = {paddingValues ->
-         Content(modifier = Modifier.padding(paddingValues), uiState = state.value)
+         Content(modifier = Modifier.padding(paddingValues),
+             uiState = state.value,
+             onBookClicked = onBookClicked)
         }
     )
 }
@@ -50,5 +54,5 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()){
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview(){
-    HomeScreen()
+    HomeScreen(onBookClicked = {})
 }

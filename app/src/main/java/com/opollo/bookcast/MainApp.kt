@@ -25,6 +25,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.opollo.bookcast.navigation.NavItem
 import com.opollo.bookcast.navigation.NavigationGraph
+import com.opollo.details.DetailsScreen
 import com.opollo.discover.DiscoverScreen
 import com.opollo.favorites.FavoritesScreen
 import com.opollo.home.HomeScreen
@@ -90,16 +91,23 @@ fun MainApp(){
             onBack = {currentBackStack.removeLastOrNull()},
             entryProvider = entryProvider {
                 entry<NavigationGraph.Home>{
-                    HomeScreen()
+                    HomeScreen(onBookClicked = {
+                        book->
+                        homeBackStack.add(NavigationGraph.Details(book))
+                    })
                 }
                 entry<NavigationGraph.Discover>{
                     DiscoverScreen(onSearchClick = {})
                 }
                 entry<NavigationGraph.Favorites>{
-                    HomeScreen()
+                    HomeScreen(onBookClicked = {})
                 }
                 entry<NavigationGraph.Profile>{
                     DiscoverScreen(onSearchClick = {})
+                }
+                entry<NavigationGraph.Details>{entry->
+                    DetailsScreen(entry.book,
+                        onBackPressed = {currentBackStack.removeLastOrNull()})
                 }
             },
             modifier = Modifier.padding(paddingValues)
