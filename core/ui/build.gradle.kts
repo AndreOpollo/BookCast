@@ -50,5 +50,6 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     debugImplementation(libs.androidx.ui.tooling)
     implementation(libs.coil.compose)
+    implementation(project(":core:domain"))
 
 }

@@ -1,8 +1,9 @@
-package com.opollo.home
+package com.opollo.genres
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import coil.util.CoilUtils.result
 import com.opollo.domain.model.Book
 import com.opollo.domain.repository.BookRepository
 import com.opollo.domain.util.Resource
@@ -15,46 +16,47 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(
+class GenreViewModel @Inject constructor(
     private val bookRepository: BookRepository
 ): ViewModel() {
 
-    private val _uiState = MutableStateFlow(HomeUiState())
+    private val _uiState = MutableStateFlow(GenreListUiState())
     val uiState = _uiState.asStateFlow()
 
-    init {
-        getRecommendedBooks()
-    }
-
-    fun getRecommendedBooks(){
+    fun getBooksByGenre(genre:String){
         _uiState.update {
             it.copy(loading = true, errorMsg = null)
         }
-        viewModelScope.launch {
-            Log.d("HomeViewModel", "Starting to collect books…")
-            bookRepository.getBooks().collectLatest {
+        viewModelScope.launch{
+            bookRepository.getBooksByGenre(genre).collectLatest {
                 result->
+                Log.d("GenreViewModel", "Starting to collect books…")
                 when(result){
                     is Resource.Error<*> -> {
+                        Log.d("GenreViewModel Error", "$result")
                         _uiState.update {
-                            it.copy(loading = false,
-                                errorMsg = result.throwable.message)
+                            it.copy(loading = false, errorMsg = result.throwable.message)
                         }
                     }
                     Resource.Loading -> {
                         _uiState.update {
-                            it.copy(loading = true)
+                            it.copy(
+                                loading = true
+                            )
                         }
                     }
                     is Resource.Success<*> -> {
-                        val books = result.data as List<Book>
+                        Log.d("GenreViewModel Succes", "$result")
+
                         _uiState.update {
-                            it.copy(loading = false,recommendedList = result.data as List<Book>)
+                            it.copy(
+                                loading = false, listByGenre = result.data as List<Book>
+                            )
                         }
                     }
                 }
             }
+
         }
     }
-
 }

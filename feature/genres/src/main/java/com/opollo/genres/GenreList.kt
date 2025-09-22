@@ -5,7 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.opollo.ui.Book
+import com.opollo.domain.model.Book
 import com.opollo.ui.BookCard
 
 @Composable

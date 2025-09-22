@@ -25,10 +25,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun GenreCard(genre: Genre, onClick:()->Unit, modifier: Modifier = Modifier){
+fun GenreCard(genre: Genre, onClick:(String)->Unit, modifier: Modifier = Modifier){
     Card(
         modifier = modifier.aspectRatio(1.2f)
-            .clickable(onClick = onClick),
+            .clickable(onClick = {onClick(genre.name)}),
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(containerColor = genre.color)
     ){

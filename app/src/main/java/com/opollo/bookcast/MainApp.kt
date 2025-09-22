@@ -28,6 +28,7 @@ import com.opollo.bookcast.navigation.NavigationGraph
 import com.opollo.details.DetailsScreen
 import com.opollo.discover.DiscoverScreen
 import com.opollo.favorites.FavoritesScreen
+import com.opollo.genres.GenreListScreen
 import com.opollo.home.HomeScreen
 
 @Composable
@@ -97,17 +98,24 @@ fun MainApp(){
                     })
                 }
                 entry<NavigationGraph.Discover>{
-                    DiscoverScreen(onSearchClick = {})
+                    DiscoverScreen(onSearchClick = {}, onGenreClicked = {
+                        genre->
+                        discoverBackStack.add(NavigationGraph.GenreList(genre))
+                    })
                 }
                 entry<NavigationGraph.Favorites>{
                     HomeScreen(onBookClicked = {})
                 }
                 entry<NavigationGraph.Profile>{
-                    DiscoverScreen(onSearchClick = {})
+                    DiscoverScreen(onSearchClick = {}, onGenreClicked = {})
                 }
                 entry<NavigationGraph.Details>{entry->
                     DetailsScreen(entry.book,
                         onBackPressed = {currentBackStack.removeLastOrNull()})
+                }
+                entry<NavigationGraph.GenreList>{
+                    entry->
+                    GenreListScreen(genre = entry.genre)
                 }
             },
             modifier = Modifier.padding(paddingValues)

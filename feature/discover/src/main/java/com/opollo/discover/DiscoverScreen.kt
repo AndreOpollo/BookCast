@@ -25,7 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun DiscoverScreen(onSearchClick:()->Unit){
+fun DiscoverScreen(onSearchClick:()->Unit,onGenreClicked:(String)->Unit){
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         modifier = Modifier.fillMaxSize()
@@ -48,7 +48,7 @@ fun DiscoverScreen(onSearchClick:()->Unit){
         }
         items(sampleGenres){
             genre->
-            GenreCard(genre, onClick = {})
+            GenreCard(genre, onClick = onGenreClicked)
         }
     }
 }
@@ -56,5 +56,5 @@ fun DiscoverScreen(onSearchClick:()->Unit){
 @Preview(showBackground = true)
 @Composable
 fun DiscoverScreenPreview(){
-    DiscoverScreen(onSearchClick = {})
+    DiscoverScreen(onSearchClick = {}, onGenreClicked = {})
 }
