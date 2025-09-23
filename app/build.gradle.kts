@@ -69,6 +69,7 @@ dependencies {
     implementation(project(":core:domain"))
     implementation(project(":feature:details"))
     implementation(project(":feature:genres"))
+    implementation(project(":feature:player"))
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
 

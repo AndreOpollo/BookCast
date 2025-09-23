@@ -67,7 +67,8 @@ import com.opollo.domain.model.Chapter
 @Composable
 fun DetailsScreen(book: Book,
                   onBackPressed:()->Unit,
-                  viewModel: DetailsViewModel = hiltViewModel()
+                  viewModel: DetailsViewModel = hiltViewModel(),
+                  onPlayClicked:()->Unit
 ){
     var isFavorite by remember { mutableStateOf(false) }
     var selectedTab by remember { mutableStateOf("Overview") }
@@ -179,7 +180,7 @@ fun DetailsScreen(book: Book,
                                 Text("Download Book")
                             }
                         }
-                        Button(onClick = {}, modifier = Modifier.weight(1f)) {
+                        Button(onClick = onPlayClicked, modifier = Modifier.weight(1f)) {
                             Row {
                                 Icon(Icons.Default.PlayArrow,
                                     "Play Book",

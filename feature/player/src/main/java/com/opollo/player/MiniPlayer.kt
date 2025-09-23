@@ -46,7 +46,7 @@ fun MiniPlayer(
     Box(
         modifier = modifier.fillMaxWidth()
             .padding(bottom = 16.dp, end = 8.dp, start = 8.dp)
-            .height(65.dp)
+            .height(70.dp)
             .clickable(onClick = onExpand)
     ){
         Row(
