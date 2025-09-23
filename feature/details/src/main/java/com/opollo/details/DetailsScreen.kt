@@ -73,8 +73,8 @@ fun DetailsScreen(book: Book,
     var selectedTab by remember { mutableStateOf("Overview") }
     val state by viewModel.uiState.collectAsState()
 
-    LaunchedEffect(selectedTab,book.urlRss) {
-        if(selectedTab == "Chapters" && book.urlRss.isNotEmpty()){
+    LaunchedEffect(book.urlRss) {
+        if(book.urlRss.isNotEmpty()){
             viewModel.getBookChapters(book.urlRss)
         }
 

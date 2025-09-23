@@ -25,8 +25,11 @@ ksp = "2.2.20-2.0.3"
 room = "2.8.0"
 nav3Core = "1.0.0-alpha09"
 hiltNavigation = "1.3.0"
+media3 = "1.8.0"
 
 [libraries]
+media3-session = {module="androidx.media3:media3-session",version.ref="media3"}
+media3-exoplayer = {module="androidx.media3:media3-exoplayer",version.ref="media3"}
 androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "nav3Core" }
 androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "nav3Core" }
 room = {module="androidx.room:room-runtime",version.ref = "room"}
