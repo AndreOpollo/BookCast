@@ -26,8 +26,13 @@ room = "2.8.0"
 nav3Core = "1.0.0-alpha09"
 hiltNavigation = "1.3.0"
 media3 = "1.8.0"
+googleServices = "4.4.3"
+firebaseBom = "34.3.0"
 
 [libraries]
+firebase-bom = {module="com.google.firebase:firebase-bom",version.ref="firebaseBom"}
+firebase-auth = {module="com.google.firebase:firebase-auth"}
+firebase-analytics= {module="com.google.firebase:firebase-analytics"}
 media3-session = {module="androidx.media3:media3-session",version.ref="media3"}
 media3-exoplayer = {module="androidx.media3:media3-exoplayer",version.ref="media3"}
 androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "nav3Core" }
@@ -72,4 +77,5 @@ android-library = { id = "com.android.library", version.ref = "agp" }
 hilt = {id="com.google.dagger.hilt.android", version.ref = "hilt"}
 ksp = {id="com.google.devtools.ksp", version.ref = "ksp"}
 kotlin-serialization = {id="org.jetbrains.kotlin.plugin.serialization" ,version.ref="kotlin"}
+google-services = {id="com.google.gms.google-services",version.ref="googleServices"}
 

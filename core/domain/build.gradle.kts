@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -43,5 +44,7 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(libs.kotlinx.serialization.core)
     implementation(libs.androidx.annotation.experimental)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
 
 }
