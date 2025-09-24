@@ -1,14 +1,23 @@
 package com.opollo.player.presentation
 
+import android.util.Log
+import androidx.compose.runtime.currentComposer
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import com.opollo.domain.model.Book
 import com.opollo.domain.model.Chapter
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -18,6 +27,12 @@ class PlayerViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(PlayerUiState())
     val uiState = _uiState.asStateFlow()
+
+    private var progressJob: Job? = null
+
+    init {
+        startProgressUpdates()
+    }
 
     fun onEvent(e: PlayerEvent){
         when(e){
@@ -29,6 +44,25 @@ class PlayerViewModel @Inject constructor(
             PlayerEvent.PlayPrevious -> skipChapter(-1)
             is PlayerEvent.SeekTo -> seekTo(e.position)
             PlayerEvent.Stop -> stop()
+        }
+    }
+
+    private fun startProgressUpdates(){
+        progressJob?.cancel()
+        progressJob = viewModelScope.launch {
+            while (isActive){
+
+                val position = player.currentPosition
+                val duration = player.duration
+
+                _uiState.update {
+                    it.copy(
+                        playbackPosition = position,
+                        currentDuration = if(duration>0) duration else it.currentDuration
+                    )
+                }
+                delay(100L)
+            }
         }
     }
 
@@ -69,7 +103,9 @@ class PlayerViewModel @Inject constructor(
             it.copy(
                 isPlaying = true,
                 currentChapter = chapter,
-                currentChapterIndex = index
+                currentChapterIndex = index,
+                playbackPosition = 0L,
+                currentDuration = 0L
             )
         }
     }

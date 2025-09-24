@@ -57,5 +57,6 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
     implementation(project(":core:domain"))
+    implementation(project(":core:player"))
 
 }

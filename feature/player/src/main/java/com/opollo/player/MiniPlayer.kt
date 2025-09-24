@@ -21,6 +21,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,15 +35,20 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.opollo.player.presentation.PlayerEvent
+import com.opollo.player.presentation.PlayerViewModel
+
 
 @Composable
 fun MiniPlayer(
     onExpand:()->Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: PlayerViewModel = hiltViewModel()
 ){
-    var isPlaying by remember { mutableStateOf(false) }
+    val state by viewModel.uiState.collectAsState()
     Box(
         modifier = modifier.fillMaxWidth()
             .padding(bottom = 16.dp, end = 8.dp, start = 8.dp)
@@ -61,7 +67,7 @@ fun MiniPlayer(
             ){
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data("")
+                        .data(state.currentBook?.coverArt?:"")
                         .crossfade(true)
                         .build(),
                     contentScale = ContentScale.Crop,
@@ -72,18 +78,18 @@ fun MiniPlayer(
                 )
                 Spacer(modifier.width(12.dp))
                 Column {
-                    Text("Main Kempf",
+                    Text(state.currentChapter?.title?:"",
                         fontWeight = FontWeight.Bold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis)
-                    Text("Fitzgerald Thomas II",
+                    Text(state.currentBook?.title?:"",
                         style = MaterialTheme.typography.bodySmall,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis)
                 }
             }
-            IconButton(onClick = {isPlaying = !isPlaying}) {
-                val icon = if(isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow
+            IconButton(onClick = {viewModel.onEvent(PlayerEvent.PlayPause)}) {
+                val icon = if(state.isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow
                 Icon(icon,
                     contentDescription = "Play/Pause",
                     modifier = Modifier.size(32.dp))

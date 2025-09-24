@@ -1,5 +1,6 @@
 package com.opollo.details
 
+import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -63,11 +64,14 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.opollo.domain.model.Book
 import com.opollo.domain.model.Chapter
+import com.opollo.player.presentation.PlayerEvent
+import com.opollo.player.presentation.PlayerViewModel
 
 @Composable
 fun DetailsScreen(book: Book,
                   onBackPressed:()->Unit,
                   viewModel: DetailsViewModel = hiltViewModel(),
+                  playerViewModel: PlayerViewModel = hiltViewModel(),
                   onPlayClicked:()->Unit
 ){
     var isFavorite by remember { mutableStateOf(false) }
@@ -78,6 +82,8 @@ fun DetailsScreen(book: Book,
         if(book.urlRss.isNotEmpty()){
             viewModel.getBookChapters(book.urlRss)
         }
+
+        Log.d("DetailsScreen","${playerViewModel.uiState.value}")
 
     }
     LazyColumn(
@@ -180,7 +186,15 @@ fun DetailsScreen(book: Book,
                                 Text("Download Book")
                             }
                         }
-                        Button(onClick = onPlayClicked, modifier = Modifier.weight(1f)) {
+                        Button(onClick = {
+                            if(state.chapters.isNotEmpty()){
+                                onPlayClicked()
+                                playerViewModel.onEvent(
+                                    PlayerEvent.LoadBook(book,state.chapters)
+                                )
+                                playerViewModel.onEvent(PlayerEvent.PlayChapter(0))
+                            }
+                        }, modifier = Modifier.weight(1f)) {
                             Row {
                                 Icon(Icons.Default.PlayArrow,
                                     "Play Book",
