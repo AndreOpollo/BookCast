@@ -1,25 +1,14 @@
 package com.opollo.player
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PauseCircle
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.PlayCircle
-import androidx.compose.material.icons.filled.SkipNext
-import androidx.compose.material.icons.filled.SkipPrevious
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Slider
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -29,14 +18,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
+import com.opollo.player.components.BookArtSection
+import com.opollo.player.components.BookInfoSection
+import com.opollo.player.components.PlayerControlsSection
+import com.opollo.player.components.ProgressSection
+import com.opollo.player.components.QueueBottomSheet
+import com.opollo.player.components.TopSection
 import com.opollo.player.presentation.PlayerEvent
 import com.opollo.player.presentation.PlayerViewModel
 
@@ -44,102 +33,84 @@ import com.opollo.player.presentation.PlayerViewModel
 fun FullScreenPlayer(
     modifier: Modifier = Modifier,
     viewModel: PlayerViewModel = hiltViewModel()
-){
+) {
     val state by viewModel.uiState.collectAsState()
     var tempSeek by remember { mutableStateOf<Long?>(null) }
+    var showDropdownMenu by remember { mutableStateOf(false) }
+    var showQueueSheet by remember { mutableStateOf(false) }
+
     val currentDuration = state.currentDuration
-    val currentPosition = tempSeek?:state.playbackPosition
+    val currentPosition = tempSeek ?: state.playbackPosition
 
-    LaunchedEffect(state.playbackPosition){
-        Log.d("Playback Position","${state.playbackPosition}")
-        Log.d("Playback Position-CurrentPosition","$currentPosition")
-
+    LaunchedEffect(state.playbackPosition) {
+        Log.d("Playback Position", "${state.playbackPosition}")
+        Log.d("Playback Position-CurrentPosition", "$currentPosition")
     }
+
     Column(
-        modifier = modifier.fillMaxSize()
-            .padding(32.dp),
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceAround
-    ){
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(state.currentBook?.coverArt?:"")
-                .crossfade(true)
-                .build(),
-            contentScale = ContentScale.Crop,
-            contentDescription = "",
-            modifier = Modifier.fillMaxWidth()
-                .aspectRatio(1f)
-                .clip(MaterialTheme.shapes.medium)
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+        TopSection(
+            showDropdownMenu = showDropdownMenu,
+            onShowDropdownChange = { showDropdownMenu = it },
+            onShowQueue = { showQueueSheet = true },
+            viewModel = viewModel,
+            state = state
         )
-        Column(horizontalAlignment = Alignment.CenterHorizontally){
-            Text(
-                text = state.currentChapter?.title?:"",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-            )
-            Text(
-                text = state.currentBook?.title?:"",
-                style = MaterialTheme.typography.titleMedium,
-            )
-        }
-        Column {
-            Slider(
-                value = if(currentDuration>0) currentPosition.toFloat() else 0f,
-                onValueChange = {
-                    tempSeek = it.toLong()
-                },
-                onValueChangeFinished = {
-                    tempSeek?.let {
-                        seek->
-                        viewModel.onEvent(PlayerEvent.SeekTo(seek))
-                    }
-                    tempSeek = null
-                },
-                valueRange = 0f..currentDuration.toFloat()
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ){
-                Text(formatTime(state.playbackPosition))
-                Text(formatTime(currentDuration))
-            }
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
-        ){
-            IconButton(onClick = {
-                viewModel.onEvent(PlayerEvent.PlayPrevious)
-            }) {
-                Icon(Icons.Default.SkipPrevious,
-                    "Previous",
-                    modifier = Modifier.size(40.dp))
-            }
-            IconButton(onClick = {
-                viewModel.onEvent(PlayerEvent.PlayPause)
-            }) {
-                Icon(if(state.isPlaying)Icons.Filled.PauseCircle
-                else Icons.Filled.PlayCircle,
-                    "Play/Pause",
-                    modifier = Modifier.size(72.dp))
-            }
-            IconButton(onClick = { viewModel.onEvent(PlayerEvent.PlayNext)}) {
-                Icon(Icons.Default.SkipNext,
-                    "Next",
-                    modifier = Modifier.size(40.dp))
-            }
 
-        }
+        Spacer(modifier = Modifier.height(16.dp))
 
+        BookArtSection(
+            coverArt = state.currentBook?.coverArt,
+            modifier = Modifier.weight(1f, false)
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        BookInfoSection(
+            chapterTitle = state.currentChapter?.title,
+            bookTitle = state.currentBook?.title
+        )
+
+        Spacer(modifier = Modifier.height(32.dp))
+        ProgressSection(
+            currentPosition = currentPosition,
+            currentDuration = currentDuration,
+            tempSeek = tempSeek,
+            onSeekChange = { tempSeek = it.toLong() },
+            onSeekFinished = {
+                tempSeek?.let { seek ->
+                    viewModel.onEvent(PlayerEvent.SeekTo(seek))
+                }
+                tempSeek = null
+            }
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+        PlayerControlsSection(
+            isPlaying = state.isPlaying,
+            onPrevious = { viewModel.onEvent(PlayerEvent.PlayPrevious) },
+            onPlayPause = { viewModel.onEvent(PlayerEvent.PlayPause) },
+            onNext = { viewModel.onEvent(PlayerEvent.PlayNext) },
+            onRewind = {  },
+            onFastForward = {  }
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+    }
+
+    if (showQueueSheet) {
+        QueueBottomSheet(
+            onDismiss = { showQueueSheet = false },
+            viewModel = viewModel,
+            state = state
+        )
     }
 }
 
-private fun formatTime(timeMs:Long):String{
-    val totalSeconds = timeMs/1000
-    val minutes = totalSeconds/60
-    val seconds = totalSeconds % 60
-    return "%d:%02d".format(minutes, seconds)
-}

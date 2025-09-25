@@ -1,5 +1,6 @@
 package com.opollo.player
 
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,9 +14,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -23,16 +24,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.input.key.Key.Companion.I
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -51,13 +46,12 @@ fun MiniPlayer(
     val state by viewModel.uiState.collectAsState()
     Box(
         modifier = modifier.fillMaxWidth()
-            .padding(bottom = 16.dp, end = 8.dp, start = 8.dp)
-            .height(70.dp)
-            .clickable(onClick = onExpand)
+            .height(72.dp)
+            .clickable(onClick = onExpand),
     ){
         Row(
             modifier = Modifier.fillMaxSize()
-                .padding(horizontal = 8.dp),
+                .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ){
@@ -65,25 +59,30 @@ fun MiniPlayer(
                 modifier = Modifier.weight(1f),
                 verticalAlignment = Alignment.CenterVertically
             ){
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(state.currentBook?.coverArt?:"")
-                        .crossfade(true)
-                        .build(),
-                    contentScale = ContentScale.Crop,
-                    contentDescription = "",
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(MaterialTheme.shapes.small)
-                )
+                Card(
+                    modifier = Modifier.size(48.dp),
+                    shape = MaterialTheme.shapes.small
+                ) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(state.currentBook?.coverArt ?: "")
+                            .crossfade(true)
+                            .build(),
+                        contentScale = ContentScale.Crop,
+                        contentDescription = "Book Cover",
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
                 Spacer(modifier.width(12.dp))
-                Column {
+                Column(modifier = Modifier.weight(1f)){
                     Text(state.currentChapter?.title?:"",
-                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis)
                     Text(state.currentBook?.title?:"",
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis)
                 }
@@ -92,10 +91,9 @@ fun MiniPlayer(
                 val icon = if(state.isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow
                 Icon(icon,
                     contentDescription = "Play/Pause",
-                    modifier = Modifier.size(32.dp))
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(28.dp))
             }
-
         }
-
     }
 }
