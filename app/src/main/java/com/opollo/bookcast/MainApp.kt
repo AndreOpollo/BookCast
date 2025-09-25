@@ -26,6 +26,7 @@ import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
@@ -50,24 +52,27 @@ import com.opollo.genres.GenreListScreen
 import com.opollo.home.HomeScreen
 import com.opollo.player.FullScreenPlayer
 import com.opollo.player.MiniPlayer
+import com.opollo.player.presentation.PlayerViewModel
 import kotlinx.coroutines.launch
 
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainApp(){
+fun MainApp(viewModel: PlayerViewModel = hiltViewModel()){
     val homeBackStack = rememberNavBackStack(NavigationGraph.Home)
     val discoverBackStack = rememberNavBackStack(NavigationGraph.Discover)
     val favoritesBackStack = rememberNavBackStack(NavigationGraph.Favorites)
     val profileBackStack = rememberNavBackStack(NavigationGraph.Profile)
+
+    val state by viewModel.uiState.collectAsState()
 
     var currentTab by remember{ mutableStateOf<NavKey>(NavigationGraph.Home) }
 
 
     val scaffoldState = rememberBottomSheetScaffoldState()
     val scope = rememberCoroutineScope()
-    var isPlayerVisible by remember { mutableStateOf(false) }
+    var isPlayerVisible  = state.currentBook != null
 
     LaunchedEffect(scaffoldState.bottomSheetState.currentValue) {
         Log.d("SheetDebug", "State: ${scaffoldState.bottomSheetState.currentValue}")
@@ -106,7 +111,7 @@ fun MainApp(){
 
     Scaffold (
         bottomBar = {
-            if (scaffoldState.bottomSheetState.currentValue != SheetValue.Expanded) {
+            if (scaffoldState.bottomSheetState.currentValue != SheetValue.Expanded && currentBackStack.size == 1) {
                 NavigationBar {
                     navItems.forEach { item ->
                         NavigationBarItem(
@@ -132,10 +137,12 @@ fun MainApp(){
             },
             sheetShape = RectangleShape,
             sheetDragHandle = {},
-            sheetPeekHeight = innerPadding.calculateBottomPadding() +  70.dp,
+            sheetPeekHeight = if(isPlayerVisible)innerPadding.calculateBottomPadding() +  70.dp else 0.dp,
         ) {
             NavDisplay(
-                modifier = Modifier.padding(innerPadding),
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .padding(bottom = if(isPlayerVisible)70.dp else 0.dp),
                 backStack = currentBackStack,
                 onBack = { currentBackStack.removeLastOrNull() },
                 entryProvider = entryProvider {

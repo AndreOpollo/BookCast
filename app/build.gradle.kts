@@ -70,7 +70,9 @@ dependencies {
     implementation(project(":feature:details"))
     implementation(project(":feature:genres"))
     implementation(project(":feature:player"))
+    implementation(project(":core:player"))
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
+    implementation(libs.hilt.navigation)
 
 }

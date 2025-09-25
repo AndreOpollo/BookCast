@@ -31,7 +31,7 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(),
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {Text("Hello, Andre")},
+                title = {Text("Welcome to BookCast")},
                 navigationIcon = {
                     Box(modifier = Modifier
                         .size(50.dp)
