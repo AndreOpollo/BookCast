@@ -165,7 +165,13 @@ fun MainApp(){
                             })
                     }
                     entry<NavigationGraph.GenreList> { entry ->
-                        GenreListScreen(genre = entry.genre)
+                        GenreListScreen(genre = entry.genre, onBackClick = {
+                            currentBackStack.removeLastOrNull()
+                        },
+                            onBookClick = {book->
+                                currentBackStack.add(NavigationGraph.Details(book))
+                            },
+                            onFavoriteToggle = {})
                     }
                 },
             )
