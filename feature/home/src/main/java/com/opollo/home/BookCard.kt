@@ -1,7 +1,6 @@
 package com.opollo.home
 
-import android.R.attr.maxLines
-import androidx.compose.foundation.Image
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -55,17 +54,22 @@ fun BookCard(book: Book,
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = book.title,
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.SemiBold,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.fillMaxWidth()
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(4.dp))
         Text(
-            text = "${book.authors.firstOrNull()?.firstName} ${book.authors.firstOrNull()?.lastName}",
+            text = book.authors.firstOrNull()?.let { author ->
+                "${author.firstName} ${author.lastName}".trim()
+            } ?: "Unknown Author",
             style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }
@@ -95,29 +99,36 @@ fun CurrentlyReadingBookCard(data: CurrentlyReadingBook){
 
 @Composable
 fun BookSection(
-    title:String,
-    items:List<Book>,
     modifier: Modifier = Modifier,
+    title:String,
+    books:List<Book> = emptyList(),
+    currentlyReadingBooks:List<Book> = emptyList(),
     onBookClicked: (Book) -> Unit
 ){
-    Text(
-        text = title,
-        style = MaterialTheme.typography.titleLarge,
-        fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(horizontal = 16.dp)
-            .padding(top = 16.dp, bottom = 8.dp)
-    )
-    LazyRow(
-        contentPadding = PaddingValues(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ){
-        items(items){item->
-            when(item){
-                is Book -> BookCard(item,onBookClicked = onBookClicked)
-                is CurrentlyReadingBook ->CurrentlyReadingBookCard(item)
+    val hasContent = books.isNotEmpty()
+    if(hasContent) {
+        Column(modifier){
+        Text(
+            text = title,
+            style = MaterialTheme.typography.headlineLarge,
+            modifier = Modifier.padding(horizontal = 16.dp)
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        LazyRow(
+            contentPadding = PaddingValues(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(currentlyReadingBooks){
+                currentlyReading->
+                BookCard(currentlyReading, onBookClicked = onBookClicked)
+            }
+            items(books) { book ->
+                    BookCard(book, onBookClicked = onBookClicked)
+
             }
         }
     }
+        }
 }
 
 @Preview(showBackground = true)

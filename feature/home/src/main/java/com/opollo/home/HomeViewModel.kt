@@ -32,7 +32,6 @@ class HomeViewModel @Inject constructor(
             it.copy(loading = true, errorMsg = null)
         }
         viewModelScope.launch {
-            Log.d("HomeViewModel", "Starting to collect books…")
             bookRepository.getBooks().collectLatest {
                 result->
                 when(result){

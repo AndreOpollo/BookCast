@@ -3,11 +3,13 @@ package com.opollo.details
 import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,6 +19,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.MenuBook
@@ -49,6 +52,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -86,36 +90,14 @@ fun DetailsScreen(book: Book,
         Log.d("DetailsScreen","${playerViewModel.uiState.value}")
 
     }
+    LaunchedEffect(Unit){
+        Log.d("Format",formatChapterDuration("00:10:40"))
+    }
     LazyColumn(
         modifier = Modifier.fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
         item {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(300.dp)
-            ) {
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(book.coverArt)
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = "Book Cover",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
-                )
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(
-                            Brush.verticalGradient(
-                                colors = listOf(Color.Black.copy(alpha = 0.6f), Color.Transparent),
-                                startY = 0f,
-                                endY = 400f
-                            )
-                        )
-                )
                 Row(
                     modifier = Modifier.fillMaxWidth()
                         .statusBarsPadding()
@@ -127,53 +109,69 @@ fun DetailsScreen(book: Book,
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = Color.White
+                            tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
                     IconButton(onClick = { isFavorite = !isFavorite }) {
                         val icon =
                             if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder
                         val tint =
-                            if (isFavorite) MaterialTheme.colorScheme.primary else Color.White
+                            if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                         Icon(icon, contentDescription = "Favorite", tint = tint)
                     }
                 }
-            }
+
         }
         item {
             Column(modifier = Modifier.fillMaxWidth()
-                .padding(16.dp),
+                .padding(horizontal = 24.dp, vertical = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally){
+
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(book.coverArt)
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = "Book Cover",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .width(200.dp)
+                        .aspectRatio(3f / 4f)
+                        .clip(MaterialTheme.shapes.medium)
+                )
+                Spacer(modifier = Modifier.height(24.dp))
                 Text(
                     text = book.title,
-                    style = MaterialTheme.typography.headlineLarge,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
+                    style = MaterialTheme.typography.displayLarge,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onBackground
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = book.authors.joinToString(separator = ", "){"${it.firstName} ${it.lastName}"  },
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    text = book.authors.joinToString(separator = ", "){"${it.firstName} ${it.lastName}"}.trim(),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
                 ){
                     Icon(
                         Icons.Default.Timer,
                         contentDescription = "Duration",
-                        modifier = Modifier.size(16.dp),
+                        modifier = Modifier.size(18.dp),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = formatTotalTime(book.totalTime),
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(32.dp))
 
                 Row(modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)){
@@ -183,7 +181,8 @@ fun DetailsScreen(book: Book,
                                     "Download",
                                     modifier = Modifier.size(ButtonDefaults.IconSize))
                                 Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
-                                Text("Download Book")
+                                Text("Download",
+                                    style = MaterialTheme.typography.labelLarge)
                             }
                         }
                         Button(onClick = {
@@ -195,23 +194,24 @@ fun DetailsScreen(book: Book,
                                 playerViewModel.onEvent(PlayerEvent.PlayChapter(0))
                             }
                         }, modifier = Modifier.weight(1f)) {
-                            Row {
                                 Icon(Icons.Default.PlayArrow,
                                     "Play Book",
                                     modifier = Modifier.size(ButtonDefaults.IconSize))
                                 Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
-                                Text("Play Book")
-                            }
+                                Text("Play",
+                                    style = MaterialTheme.typography.labelLarge)
+
                         }
                     }
                 }
             }
         item {
             Column{
-                HorizontalDivider(modifier = Modifier.padding(top = 16.dp))
+                Spacer(modifier = Modifier.height(24.dp))
+                HorizontalDivider(color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.12f))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceAround
+                    horizontalArrangement = Arrangement.SpaceEvenly
                 ){
                     TabButton("Overview",
                         isSelected = selectedTab == "Overview",
@@ -221,7 +221,7 @@ fun DetailsScreen(book: Book,
                         onClick = {selectedTab = "Chapters"})
 
                 }
-                HorizontalDivider()
+                HorizontalDivider(color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.12f))
 
             }
         }
@@ -229,7 +229,7 @@ fun DetailsScreen(book: Book,
             AnimatedContent(
                 targetState = selectedTab,
                 label = "TabContent",
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 24.dp)
             ) {
                 tab->
                 when(tab){
@@ -241,8 +241,8 @@ fun DetailsScreen(book: Book,
                         Text(
                             text = annotatedString,
                             style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            lineHeight = MaterialTheme.typography.bodyLarge.lineHeight * 1.5
+                            color = MaterialTheme.colorScheme.onBackground,
+                            lineHeight = MaterialTheme.typography.bodyLarge.lineHeight * 1.4
                         )
                     }
                     "Chapters"->{
@@ -258,8 +258,15 @@ fun DetailsScreen(book: Book,
 @Composable
 fun ChapterList(chapters:List<Chapter>){
     Column {
-        chapters.forEach{chapter->
+        chapters.forEachIndexed{index,chapter->
             ChapterItem(chapter, onClick = {})
+
+            if(index<chapters.size-1){
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 4.dp),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.08f)
+                )
+            }
         }
     }
 
@@ -268,44 +275,65 @@ fun ChapterList(chapters:List<Chapter>){
 @Composable
 fun ChapterItem(chapter: Chapter,
                 onClick: () -> Unit){
-    Card(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp)
-    ){
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ){
+            .clickable { onClick() }
+            .padding(vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            modifier = Modifier
+                .size(32.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.primaryContainer,
+                    shape = RoundedCornerShape(8.dp)
+                ),
+            contentAlignment = Alignment.Center
+        ) {
             Text(
-                text = "Chapter ${chapter.chapterNumber}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.primary
+                text = chapter.chapterNumber.toString(),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                fontWeight = FontWeight.SemiBold
             )
+        }
+        Spacer(modifier = Modifier.width(16.dp))
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
             Text(
                 text = chapter.title,
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(top = 4.dp)
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground,
+                maxLines = 2
             )
+            Spacer(modifier = Modifier.height(2.dp))
             Text(
-                text = chapter.duration,
-                style = MaterialTheme.typography.bodySmall,
+                text = formatChapterDuration(chapter.duration),
+                style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = 4.dp)
+                maxLines = 1
             )
-
         }
-
+        Icon(
+            Icons.Default.PlayArrow,
+            contentDescription = "Play Chapter",
+            modifier = Modifier.size(20.dp),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
-
 }
 
 @Composable
 fun TabButton(text:String,isSelected:Boolean,onClick:()->Unit){
-    TextButton(onClick) {
+    TextButton(onClick,
+        modifier = Modifier.padding(horizontal = 8.dp, vertical = 12.dp)) {
         Text(text,
+            style = MaterialTheme.typography.titleLarge,
             color = if(isSelected)MaterialTheme.colorScheme.primary
             else MaterialTheme.colorScheme.onSurfaceVariant,
-            fontWeight = if(isSelected) FontWeight.Bold else FontWeight.Normal)
+            fontWeight = if(isSelected) FontWeight.Bold else FontWeight.Medium)
     }
 }
 
@@ -315,9 +343,23 @@ private fun formatTotalTime(time:String):String{
     if(parts.size<2) return time
 
     return when(parts.size){
-        3->"${parts[0]} hrs  ${parts[1]} mins ${parts[2]} s"
-        2->"${parts[0]} hrs ${parts[1]} mins"
+        3->"${parts[0]}h ${parts[1]}m"
+        2->"${parts[0]}h ${parts[1]}m"
         else -> time
+    }
+
+}
+
+private fun formatChapterDuration(duration:String):String{
+
+    val parts = duration.split(":")
+
+    if(parts.size<2) return duration
+
+    return when(parts.size){
+        3->"${parts[1]}m ${parts[2]}s"
+        2->"${parts[0]}m ${parts[1]}s"
+        else -> duration
     }
 
 }
