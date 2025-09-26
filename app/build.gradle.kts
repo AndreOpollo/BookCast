@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.google.services)
 
 }
 
@@ -72,8 +73,11 @@ dependencies {
     implementation(project(":feature:player"))
     implementation(project(":core:player"))
     implementation(project(":feature:profile"))
+    implementation(project(":feature:auth"))
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
     implementation(libs.hilt.navigation)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
 
 }

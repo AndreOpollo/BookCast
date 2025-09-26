@@ -9,6 +9,10 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed class NavigationGraph: NavKey{
     @Serializable
+    data object Login: NavigationGraph()
+    @Serializable
+    data object Register: NavigationGraph()
+    @Serializable
     data object Home: NavigationGraph()
     @Serializable
     data object Discover: NavigationGraph()

@@ -21,7 +21,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "Book Cast"
 include(":app")
-include(":auth")
+include(":feature:auth")
 include(":feature:home")
 include(":feature:details")
 include(":feature:discover")

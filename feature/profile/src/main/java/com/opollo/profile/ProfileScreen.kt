@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.opollo.profile.components.LogoutButton
 import com.opollo.profile.components.SettingsItem
 import com.opollo.profile.components.SettingsSection
@@ -37,7 +38,6 @@ fun ProfileSettingsScreen(
         initials = "GU",
         isGuest = true
     ),
-    onLogout: () -> Unit = {},
     onUpgrade: () -> Unit = {},
     onEditProfile: () -> Unit = {},
     onNotificationSettings: () -> Unit = {},
@@ -45,7 +45,8 @@ fun ProfileSettingsScreen(
     onDownloadSettings: () -> Unit = {},
     onPrivacy: () -> Unit = {},
     onSupport: () -> Unit = {},
-    onAbout: () -> Unit = {}
+    onAbout: () -> Unit = {},
+    viewModel: ProfileViewModel = hiltViewModel()
 ) {
     LazyColumn(
         modifier = Modifier
@@ -136,7 +137,7 @@ fun ProfileSettingsScreen(
             )
         }
         item {
-            LogoutButton(onLogout = onLogout)
+            LogoutButton(onLogout = {viewModel.logout()})
         }
         item {
             Spacer(modifier = Modifier.height(32.dp))
