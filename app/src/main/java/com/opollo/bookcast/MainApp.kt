@@ -53,6 +53,7 @@ import com.opollo.home.HomeScreen
 import com.opollo.player.FullScreenPlayer
 import com.opollo.player.MiniPlayer
 import com.opollo.player.presentation.PlayerViewModel
+import com.opollo.profile.ProfileSettingsScreen
 import kotlinx.coroutines.launch
 
 
@@ -160,7 +161,7 @@ fun MainApp(viewModel: PlayerViewModel = hiltViewModel()){
                         HomeScreen(onBookClicked = {})
                     }
                     entry<NavigationGraph.Profile> {
-                        DiscoverScreen(onSearchClick = {}, onGenreClicked = {})
+                        ProfileSettingsScreen()
                     }
                     entry<NavigationGraph.Details> { entry ->
                         DetailsScreen(

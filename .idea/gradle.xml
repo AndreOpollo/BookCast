@@ -25,6 +25,7 @@
             <option value="$PROJECT_DIR$/feature/genres" />
             <option value="$PROJECT_DIR$/feature/home" />
             <option value="$PROJECT_DIR$/feature/player" />
+            <option value="$PROJECT_DIR$/feature/profile" />
             <option value="$PROJECT_DIR$/feature/search" />
           </set>
         </option>
