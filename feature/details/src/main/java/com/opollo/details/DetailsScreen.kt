@@ -81,6 +81,7 @@ fun DetailsScreen(book: Book,
     var isFavorite by remember { mutableStateOf(false) }
     var selectedTab by remember { mutableStateOf("Overview") }
     val state by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
 
     LaunchedEffect(book.urlRss) {
         if(book.urlRss.isNotEmpty()){
@@ -189,9 +190,10 @@ fun DetailsScreen(book: Book,
                             if(state.chapters.isNotEmpty()){
                                 onPlayClicked()
                                 playerViewModel.onEvent(
-                                    PlayerEvent.LoadBook(book,state.chapters)
+                                    PlayerEvent.LoadBook(book,state.chapters),
+                                    context
                                 )
-                                playerViewModel.onEvent(PlayerEvent.PlayChapter(0))
+                                playerViewModel.onEvent(PlayerEvent.PlayChapter(0),context)
                             }
                         }, modifier = Modifier.weight(1f)) {
                                 Icon(Icons.Default.PlayArrow,

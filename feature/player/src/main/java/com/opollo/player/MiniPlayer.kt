@@ -44,6 +44,7 @@ fun MiniPlayer(
     viewModel: PlayerViewModel = hiltViewModel()
 ){
     val state by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
     Box(
         modifier = modifier.fillMaxWidth()
             .height(72.dp)
@@ -87,7 +88,7 @@ fun MiniPlayer(
                         overflow = TextOverflow.Ellipsis)
                 }
             }
-            IconButton(onClick = {viewModel.onEvent(PlayerEvent.PlayPause)}) {
+            IconButton(onClick = {viewModel.onEvent(PlayerEvent.PlayPause,context)}) {
                 val icon = if(state.isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow
                 Icon(icon,
                     contentDescription = "Play/Pause",

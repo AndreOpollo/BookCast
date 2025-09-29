@@ -18,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.opollo.player.components.BookArtSection
@@ -42,10 +43,8 @@ fun FullScreenPlayer(
     val currentDuration = state.currentDuration
     val currentPosition = tempSeek ?: state.playbackPosition
 
-    LaunchedEffect(state.playbackPosition) {
-        Log.d("Playback Position", "${state.playbackPosition}")
-        Log.d("Playback Position-CurrentPosition", "$currentPosition")
-    }
+
+    val context = LocalContext.current
 
     Column(
         modifier = modifier
@@ -94,9 +93,9 @@ fun FullScreenPlayer(
         Spacer(modifier = Modifier.height(24.dp))
         PlayerControlsSection(
             isPlaying = state.isPlaying,
-            onPrevious = { viewModel.onEvent(PlayerEvent.PlayPrevious) },
-            onPlayPause = { viewModel.onEvent(PlayerEvent.PlayPause) },
-            onNext = { viewModel.onEvent(PlayerEvent.PlayNext) },
+            onPrevious = { viewModel.onEvent(PlayerEvent.PlayPrevious,context) },
+            onPlayPause = { viewModel.onEvent(PlayerEvent.PlayPause,context) },
+            onNext = { viewModel.onEvent(PlayerEvent.PlayNext,context) },
             onRewind = {  },
             onFastForward = {  }
         )
