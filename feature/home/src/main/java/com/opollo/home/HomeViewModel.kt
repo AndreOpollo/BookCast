@@ -3,9 +3,12 @@ package com.opollo.home
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import coil.util.CoilUtils.result
 import com.opollo.domain.model.Book
 import com.opollo.domain.model.Chapter
+import com.opollo.domain.model.ReadingProgress
 import com.opollo.domain.repository.BookRepository
+import com.opollo.domain.repository.ReadingProgressRepository
 import com.opollo.domain.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +20,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val bookRepository: BookRepository
+    private val bookRepository: BookRepository,
+    private val readingProgressRepository: ReadingProgressRepository
 ): ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -25,6 +29,39 @@ class HomeViewModel @Inject constructor(
 
     init {
         getRecommendedBooks()
+        getCurrentlyReadingList()
+    }
+
+    fun getCurrentlyReadingList(){
+        _uiState.update {
+            it.copy(loading = true, errorMsg = null, currentlyReadingBookList = emptyList())
+        }
+        viewModelScope.launch {
+            readingProgressRepository.listenToAllReadingProgress().collectLatest {
+                result->
+                Log.d("HomeViewModel","$result")
+                when(result){
+                    is Resource.Error<*> -> {
+                        Log.d("HomeViewModel","$result")
+                        _uiState.update {
+                            it.copy(loading = false, errorMsg = result.throwable.message)
+                        }
+                    }
+                    Resource.Loading -> {
+                        Log.d("HomeViewModel","$result")
+                        _uiState.update {
+                            it.copy(loading = true)
+                        }
+                    }
+                    is Resource.Success<*> -> {
+                        Log.d("HomeViewModel","$result")
+                        _uiState.update {
+                            it.copy(loading = false, currentlyReadingBookList = result.data as List<ReadingProgress>)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     fun getRecommendedBooks(){

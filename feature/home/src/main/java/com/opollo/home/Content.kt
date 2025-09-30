@@ -26,7 +26,7 @@ fun Content(modifier: Modifier = Modifier,
         item {
             BookSection(
                 title = "Continue Reading",
-                books = emptyList(),
+                currentlyReadingBooks = uiState.currentlyReadingBookList,
                 onBookClicked = onBookClicked
             )
         }

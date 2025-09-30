@@ -59,4 +59,6 @@ dependencies {
     implementation(project(":core:domain"))
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
+
 }

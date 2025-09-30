@@ -26,11 +26,21 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import androidx.core.net.toUri
+import com.opollo.domain.model.ReadingProgress
+import com.opollo.domain.repository.AuthRepository
+import com.opollo.domain.repository.ReadingProgressRepository
+import com.opollo.domain.util.Resource
 import com.opollo.player.BackgroundPlayService
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
+import java.util.concurrent.TimeUnit
 
 @HiltViewModel
 class PlayerViewModel @Inject constructor(
-    private val player: ExoPlayer
+    private val player: ExoPlayer,
+    private val repository: ReadingProgressRepository,
+    private val authRepository: AuthRepository
 ): ViewModel(){
 
     private val _uiState = MutableStateFlow(PlayerUiState())
@@ -38,10 +48,18 @@ class PlayerViewModel @Inject constructor(
 
     private var progressJob: Job? = null
 
+    private var lastSaveTimeMillis = 0L
+    private val SAVE_INTERVAL_MILLIS = 15_000L
+
     init {
+
+
         player.addListener(object: Player.Listener{
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 _uiState.update { it.copy(isPlaying = isPlaying) }
+                if(!isPlaying){
+                    saveCurrentProgress()
+                }
             }
 
             override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
@@ -57,6 +75,7 @@ class PlayerViewModel @Inject constructor(
                         currentDuration = player.duration
                     )
                 }
+                saveCurrentProgress()
             }
         })
         startProgressUpdates()
@@ -89,7 +108,12 @@ class PlayerViewModel @Inject constructor(
                         currentDuration = if(duration>0) duration else it.currentDuration
                     )
                 }
-                delay(100L)
+                val currentTime = System.currentTimeMillis()
+                if (player.isPlaying && (currentTime - lastSaveTimeMillis > SAVE_INTERVAL_MILLIS)) {
+                    saveCurrentProgress()
+                    lastSaveTimeMillis = currentTime
+                }
+                delay(500L)
             }
         }
     }
@@ -104,30 +128,37 @@ class PlayerViewModel @Inject constructor(
                 isLoading = true
             )
         }
-        val authors = book.authors.joinToString(","){"${it.firstName} ${it.lastName}"}
         player.setMediaItems(
-            chapters.map {
-                chapter->
-                MediaItem.Builder()
-                    .setUri(chapter.audioUrl)
-                    .setMediaId(chapter.chapterNumber.toString())
-                    .setTag(chapter)
-                    .setMediaMetadata(
-                        MediaMetadata.Builder()
-                            .setTitle("${book.title} - Chapter ${chapter.chapterNumber}")
-                            .setArtist(authors)
-                            .setArtworkUri(book.coverArt.toUri())
-                            .build()
-                    )
-                    .build()
-            }
+            chapters.map {it.toMediaItem(book) }
         )
 
         player.prepare()
-        _uiState.update {
-            it.copy(isLoading = false)
+        viewModelScope.launch {
+            val savedProgress = repository.listenToReadingProgress(book.id).first()
+            when (savedProgress) {
+                is Resource.Success -> {
+                    val savedProgress = savedProgress.data
+                    val startChapter = savedProgress.currentChapter
+                    val startPosition = TimeUnit.SECONDS.toMillis(savedProgress.currentPositionSecs)
+                    player.seekTo(startChapter, startPosition)
+                    playChapter(startChapter, context)
+                    _uiState.update { it.copy(isLoading = false) }
+                }
+                is Resource.Error -> {
+                    // fallback if no saved progress or error occurred
+                    Log.w("PlayerViewModel", "No saved progress: ${savedProgress.throwable?.message}")
+                    playChapter(0, context)
+                    _uiState.update { it.copy(isLoading = false) }
+                }
+                null -> {
+                    // flow never emitted, just play from beginning
+                    playChapter(0, context)
+                    _uiState.update { it.copy(isLoading = false) }
+                }
+
+                Resource.Loading -> {_uiState.update { it.copy(isLoading = true) }}
+            }
         }
-        playChapter(0,context)
     }
 
     private fun playChapter(index:Int,context: Context){
@@ -189,8 +220,120 @@ class PlayerViewModel @Inject constructor(
             context.startService(intent)
         }
     }
+
+    fun saveCurrentProgress(){
+        val book = _uiState.value.currentBook?:return
+        if(player.currentMediaItem == null) return
+
+        viewModelScope.launch {
+            val totalDurationMillis = (0 until player.mediaItemCount).sumOf{
+                index->
+                player.getMediaItemAt(index).let {
+                    val durationStr = _uiState.value.chapters.getOrNull(index)?.duration ?: "0"
+                    parseTimeToMillis(durationStr)                }
+            }
+            val completedChaptersDuration = (0 until player.currentMediaItemIndex).sumOf { index ->
+                val durationStr = _uiState.value.chapters.getOrNull(index)?.duration ?: "0"
+                parseTimeToMillis(durationStr)
+            }
+            val elapsedMillis = completedChaptersDuration + player.currentPosition
+
+            // Calculate percentage
+            val progressPercentage = if (totalDurationMillis > 0) {
+                ((elapsedMillis.toFloat() / totalDurationMillis) * 100).coerceIn(0f, 100f)
+            } else {
+                0f
+            }
+
+            val remainingMillis = totalDurationMillis - elapsedMillis
+            val timeRemaining = formatTimeRemaining(remainingMillis)
+
+
+            val progress = ReadingProgress(
+                book = book,
+                currentChapter = player.currentMediaItemIndex,
+                totalChapters = book.numSections.toIntOrNull()?:player.mediaItemCount,
+                currentPositionSecs = TimeUnit.MILLISECONDS.toSeconds(player.currentPosition),
+                progressPercentage = progressPercentage,
+                timeRemaining = timeRemaining,
+                lastReadTimestamp = System.currentTimeMillis()
+            )
+            repository.updateReadingProgress(progress)
+        }
+    }
+
+    private fun Chapter.toMediaItem(book: Book): MediaItem {
+        val authors = book.authors.joinToString(", ") { "${it.firstName} ${it.lastName}" }
+        return MediaItem.Builder()
+            .setUri(this.audioUrl)
+            .setMediaId(this.chapterNumber.toString())
+            .setTag(this)
+            .setMediaMetadata(
+                MediaMetadata.Builder()
+                    .setTitle("${book.title} - Chapter ${this.chapterNumber}")
+                    .setArtist(authors)
+                    .setArtworkUri(book.coverArt.toUri())
+                    .build()
+            )
+            .build()
+    }
+    fun clearPlayer() {
+        player.stop()
+        player.clearMediaItems()
+        _uiState.update {
+            PlayerUiState()
+        }
+        progressJob?.cancel()
+    }
     override fun onCleared() {
         super.onCleared()
         player.release()
+    }
+
+    private fun formatTimeRemaining(millis: Long): String {
+        val hours = TimeUnit.MILLISECONDS.toHours(millis)
+        val minutes = TimeUnit.MILLISECONDS.toMinutes(millis) % 60
+
+        return when {
+            hours > 0 -> "${hours}h ${minutes}m remaining"
+            minutes > 0 -> "${minutes}m remaining"
+            else -> "Less than 1m remaining"
+        }
+    }
+    private fun parseTimeToMillis(timeString: String): Long {
+        return try {
+            val cleaned = timeString.trim()
+            val parts = cleaned.split(":")
+
+            when (parts.size) {
+                3 -> {
+                    // Format: HH:MM:SS
+                    val hours = parts[0].toLongOrNull() ?: 0L
+                    val minutes = parts[1].toLongOrNull() ?: 0L
+                    val seconds = parts[2].toLongOrNull() ?: 0L
+
+                    TimeUnit.HOURS.toMillis(hours) +
+                            TimeUnit.MINUTES.toMillis(minutes) +
+                            TimeUnit.SECONDS.toMillis(seconds)
+                }
+                2 -> {
+                    // Format: MM:SS
+                    val minutes = parts[0].toLongOrNull() ?: 0L
+                    val seconds = parts[1].toLongOrNull() ?: 0L
+
+                    TimeUnit.MINUTES.toMillis(minutes) +
+                            TimeUnit.SECONDS.toMillis(seconds)
+                }
+                1 -> {
+                    // Format: SS (seconds only)
+                    val seconds = parts[0].toLongOrNull() ?: 0L
+                    TimeUnit.SECONDS.toMillis(seconds)
+                }
+                else -> 0L
+            }
+        } catch (e: Exception) {
+            Log.e("PlayerViewModel", "Error parsing time: $timeString", e)
+            0L
+        }
     }
 }

@@ -1,12 +1,10 @@
-package com.opollo.home
-
+package com.opollo.currents
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -16,14 +14,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.MenuBook
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.outlined.MenuBook
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -38,70 +36,22 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import coil.request.ImageRequest
-import com.opollo.domain.model.Book
 import com.opollo.domain.model.ReadingProgress
 
 @Composable
-fun BookCard(book: Book,
-             modifier: Modifier = Modifier,
-             onBookClicked:(Book)->Unit){
-    Column(
-        modifier = modifier.width(140.dp)
-    ){
-        AsyncImage(model = ImageRequest.Builder(LocalContext.current)
-            .data(book.coverArt)
-            .crossfade(true)
-            .build(),
-            contentDescription = book.title,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxWidth()
-                .aspectRatio(3f/4f)
-                .clip(MaterialTheme.shapes.medium)
-                .clickable(onClick = {onBookClicked(book)})
-            )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = book.title,
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.SemiBold,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = book.authors.firstOrNull()?.let { author ->
-                "${author.firstName} ${author.lastName}".trim()
-            } ?: "Unknown Author",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.fillMaxWidth()
-        )
-    }
-}
-
-@Composable
-fun CurrentlyReadingBookCard(
+fun CurrentlyReadingCard(
     progress: ReadingProgress,
-    onBookClick:(Book)->Unit,
-    onFavoriteClick:()->Unit,
+    onBookClick:()->Unit,
+    onFavoriteClick:(Boolean)->Unit,
     onPlayClick:()->Unit
 ){
     Card(
         modifier = Modifier
-            .width(160.dp)
-            .clickable { onBookClick(progress.book) },
+            .fillMaxWidth()
+            .clickable{onBookClick()},
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
@@ -110,26 +60,22 @@ fun CurrentlyReadingBookCard(
             hoveredElevation = 8.dp
         ),
         shape = MaterialTheme.shapes.medium
-    ) {
-        Column(
-            modifier = Modifier.padding(12.dp)
-        ) {
+    ){
+        Column(modifier = Modifier.padding(12.dp)){
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
                     .aspectRatio(0.75f)
                     .clip(MaterialTheme.shapes.small)
-            ) {
+            ){
                 AsyncImage(
                     model = progress.book.coverArt,
-                    contentDescription = "Cover of ${progress.book?.title}",
+                    contentDescription = "Cover of ${progress.book.title}",
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
-                
+
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
+                    modifier = Modifier.fillMaxSize()
                         .background(
                             Brush.verticalGradient(
                                 colors = listOf(
@@ -139,31 +85,28 @@ fun CurrentlyReadingBookCard(
                             )
                         )
                 )
-                
+
                 Box(
-                    modifier = Modifier
-                        .size(32.dp)
+                    modifier = Modifier.size(40.dp)
                         .align(Alignment.Center)
                         .background(
                             color = MaterialTheme.colorScheme.primary.copy(alpha = 0.9f),
                             shape = CircleShape
                         )
-                        .clickable { onPlayClick() },
+                        .clickable{onPlayClick()},
                     contentAlignment = Alignment.Center
-                ) {
+                ){
                     Icon(
                         Icons.Default.PlayArrow,
                         contentDescription = "Play",
                         tint = Color.White,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(24.dp)
                     )
                 }
-                
                 IconButton(
-                    onClick = {  },
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .size(28.dp)
+                    onClick = {},
+                    modifier = Modifier.align(Alignment.TopEnd)
+                        .size(32.dp)
                         .background(
                             color = Color.Black.copy(alpha = 0.5f),
                             shape = CircleShape
@@ -173,113 +116,99 @@ fun CurrentlyReadingBookCard(
                         imageVector = if (progress.isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
                         contentDescription = if (progress.isFavorite) "Remove from favorites" else "Add to favorites",
                         tint = if (progress.isFavorite) Color.Red else Color.White,
-                        modifier = Modifier.size(14.dp)
+                        modifier = Modifier.size(16.dp)
                     )
                 }
-                
-                Card(
+
+                Card (
                     modifier = Modifier
                         .align(Alignment.TopStart)
-                        .padding(6.dp),
+                        .padding(8.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.9f)
                     ),
                     shape = MaterialTheme.shapes.small
-                ) {
+                ){
                     Text(
-                        text = "${(progress.progressPercentage).toInt()}%",
+                        text = "${(progress.progressPercentage * 100).toInt()}%",
                         style = MaterialTheme.typography.labelSmall,
                         color = Color.White,
-                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                     )
                 }
             }
-
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             Text(
                 text = progress.book.title,
-                style = MaterialTheme.typography.titleLarge.copy(fontSize = 14.sp),
+                style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurface,
-                maxLines = 2,
+                maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
 
-            Spacer(modifier = Modifier.height(2.dp))
-            
+            Spacer(modifier = Modifier.height(4.dp))
+
             Text(
                 text = progress.book.authors.joinToString(", ") { "${it.firstName} ${it.lastName}" },
-                style = MaterialTheme.typography.bodyMedium.copy(fontSize = 12.sp),
+                style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
 
-            Spacer(modifier = Modifier.height(6.dp))
-            
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        Icons.AutoMirrored.Outlined.MenuBook,
+                        contentDescription = null,
+                        modifier = Modifier.size(14.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    Spacer(modifier = Modifier.width(4.dp))
+
+                    Text(
+                        text = "Ch ${progress.currentChapter}/${progress.totalChapters}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                Text(
+                    text = progress.timeRemaining,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
             LinearProgressIndicator(
-                progress = {progress.progressPercentage/100f},
+                progress = {progress.progressPercentage},
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(3.dp)
+                    .height(4.dp)
                     .clip(RoundedCornerShape(2.dp)),
                 color = MaterialTheme.colorScheme.primary,
                 trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
-            
+            Spacer(modifier = Modifier.height(8.dp))
+
             Text(
-                text = "Ch ${progress.currentChapter}/${progress.totalChapters} • ${progress.timeRemaining}",
-                style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                text = "Last read ${progress.lastReadTime}",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
             )
         }
     }
-}
-
-@Composable
-fun BookSection(
-    modifier: Modifier = Modifier,
-    title:String,
-    books:List<Book> = emptyList(),
-    currentlyReadingBooks:List<ReadingProgress> = emptyList(),
-    onBookClicked: (Book) -> Unit
-){
-    val hasContent = books.isNotEmpty()|| currentlyReadingBooks.isNotEmpty()
-    if(hasContent) {
-        Column(modifier){
-        Text(
-            text = title,
-            style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier.padding(horizontal = 16.dp)
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-        LazyRow(
-            contentPadding = PaddingValues(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(currentlyReadingBooks){
-                currentlyReading->
-                CurrentlyReadingBookCard(
-                    progress = currentlyReading,
-                    onBookClick = {},
-                    onFavoriteClick = {},
-                    onPlayClick = {}
-                )
-            }
-            items(books) { book ->
-                BookCard(book, onBookClicked = onBookClicked)
-
-            }
-        }
-    }
-        }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun BookCardPreview(){
 }

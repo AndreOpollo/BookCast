@@ -4,6 +4,7 @@ import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FirebaseFirestore
 import com.opollo.domain.repository.AuthRepository
 import com.opollo.domain.util.Resource
 import kotlinx.coroutines.channels.awaitClose
@@ -13,7 +14,7 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
-    private val auth: FirebaseAuth
+    private val auth: FirebaseAuth,
 ): AuthRepository{
     override suspend fun getAuthState(): Flow<FirebaseUser?> = callbackFlow {
         val authStateListener = FirebaseAuth.AuthStateListener{
@@ -82,6 +83,7 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun logout() {
+
         auth.signOut()
     }
 }

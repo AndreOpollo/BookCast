@@ -3,6 +3,8 @@ package com.opollo.data.di
 import android.content.Context
 import androidx.activity.contextaware.ContextAware
 import androidx.room.Room
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.opollo.data.local.dao.AuthorDao
 import com.opollo.data.local.dao.BookAuthorDao
@@ -10,7 +12,9 @@ import com.opollo.data.local.dao.BookDao
 import com.opollo.data.local.db.BookDatabase
 import com.opollo.data.remote.api.BooksApiService
 import com.opollo.data.repository.BookRepositoryImpl
+import com.opollo.data.repository.ReadingProgressRepositoryImpl
 import com.opollo.domain.repository.BookRepository
+import com.opollo.domain.repository.ReadingProgressRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -122,4 +126,17 @@ object DataModule {
             bookAuthorDao
         )
     }
+
+    @Provides
+    @Singleton
+    fun provideFirebaseFirestore(): FirebaseFirestore = FirebaseFirestore.getInstance()
+
+    @Provides
+    @Singleton
+    fun provideReadingRepositoryImpl(
+        auth: FirebaseAuth,
+        firestore: FirebaseFirestore
+    ): ReadingProgressRepository = ReadingProgressRepositoryImpl(auth,firestore)
+
+
 }

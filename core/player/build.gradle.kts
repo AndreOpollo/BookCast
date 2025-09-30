@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -49,4 +50,6 @@ dependencies {
     implementation(libs.media3.exoplayer)
     implementation(project(":core:domain"))
     implementation(libs.material.icons.extended)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
 }

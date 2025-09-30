@@ -1,9 +1,11 @@
 package com.opollo.auth.presentation
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.opollo.domain.repository.AuthRepository
+import com.opollo.domain.repository.ReadingProgressRepository
 import com.opollo.domain.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
 ): ViewModel() {
 
     private val _authState = MutableStateFlow<AuthState>(AuthState.Loading)
@@ -29,6 +31,8 @@ class AuthViewModel @Inject constructor(
             authRepository.getAuthState().collectLatest {
                 user->
                 _authState.value = if(user!=null){
+                    Log.d("AuthViewmodel","$user")
+                    Log.d("AuthViewmodel","${user.uid}")
                     AuthState.Authenticated
                 }else{
                     AuthState.Unauthenticated

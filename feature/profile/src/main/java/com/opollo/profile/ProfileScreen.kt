@@ -46,7 +46,7 @@ fun ProfileSettingsScreen(
     onPrivacy: () -> Unit = {},
     onSupport: () -> Unit = {},
     onAbout: () -> Unit = {},
-    viewModel: ProfileViewModel = hiltViewModel()
+    viewModel: ProfileViewModel = hiltViewModel(),
 ) {
     LazyColumn(
         modifier = Modifier

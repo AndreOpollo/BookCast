@@ -1,6 +1,8 @@
 package com.opollo.home
 
+import com.opollo.domain.model.Author
 import com.opollo.domain.model.Book
+import com.opollo.domain.model.ReadingProgress
 
 //data class Book(
 //    val id:Int,
@@ -14,5 +16,3 @@ data class CurrentlyReadingBook(
     val currentChapter:Int,
     val totalChapters:Int
 )
-
-
