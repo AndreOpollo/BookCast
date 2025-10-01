@@ -39,12 +39,14 @@ import com.opollo.bookcast.navigation.NavItem
 import com.opollo.bookcast.navigation.NavigationGraph
 import com.opollo.details.DetailsScreen
 import com.opollo.discover.DiscoverScreen
+import com.opollo.favorites.FavoritesScreen
 import com.opollo.genres.GenreListScreen
 import com.opollo.home.HomeScreen
 import com.opollo.player.FullScreenPlayer
 import com.opollo.player.MiniPlayer
 import com.opollo.player.presentation.PlayerViewModel
 import com.opollo.profile.ProfileSettingsScreen
+import com.opollo.search.SearchScreen
 import kotlinx.coroutines.launch
 
 
@@ -144,15 +146,25 @@ fun AppNavigation(viewModel: PlayerViewModel = hiltViewModel()){
                         })
                     }
                     entry<NavigationGraph.Discover> {
-                        DiscoverScreen(onSearchClick = {}, onGenreClicked = { genre ->
+                        DiscoverScreen(onSearchClick = {
+                            discoverBackStack.add(NavigationGraph.Search)
+                        }, onGenreClicked = { genre ->
                             discoverBackStack.add(NavigationGraph.GenreList(genre))
                         })
                     }
                     entry<NavigationGraph.Favorites> {
-                        HomeScreen(onBookClicked = {})
+                        FavoritesScreen(onBookClick = {
+                        })
                     }
                     entry<NavigationGraph.Profile> {
                         ProfileSettingsScreen()
+                    }
+                    entry<NavigationGraph.Search>{
+                        SearchScreen(onBookClick = {
+                            book->
+                            currentBackStack.add(NavigationGraph.Details(book))
+                        },
+                        onBackClick = {currentBackStack.removeLastOrNull()} )
                     }
                     entry<NavigationGraph.Details> { entry ->
                         DetailsScreen(

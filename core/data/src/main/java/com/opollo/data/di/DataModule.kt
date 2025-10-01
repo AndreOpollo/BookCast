@@ -12,8 +12,10 @@ import com.opollo.data.local.dao.BookDao
 import com.opollo.data.local.db.BookDatabase
 import com.opollo.data.remote.api.BooksApiService
 import com.opollo.data.repository.BookRepositoryImpl
+import com.opollo.data.repository.FavoritesRepositoryImpl
 import com.opollo.data.repository.ReadingProgressRepositoryImpl
 import com.opollo.domain.repository.BookRepository
+import com.opollo.domain.repository.FavoritesRepository
 import com.opollo.domain.repository.ReadingProgressRepository
 import dagger.Module
 import dagger.Provides
@@ -137,6 +139,13 @@ object DataModule {
         auth: FirebaseAuth,
         firestore: FirebaseFirestore
     ): ReadingProgressRepository = ReadingProgressRepositoryImpl(auth,firestore)
+
+    @Provides
+    @Singleton
+    fun provideFavoritesRepositoryImpl(
+        auth: FirebaseAuth,
+        firestore: FirebaseFirestore
+    ): FavoritesRepository = FavoritesRepositoryImpl(firestore,auth)
 
 
 }

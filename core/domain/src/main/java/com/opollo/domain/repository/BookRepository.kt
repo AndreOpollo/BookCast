@@ -14,4 +14,6 @@ interface BookRepository {
     suspend fun getBookByTitle(title:String,
                                fetchFromRemote: Boolean = false):Flow<Resource<Book?>>
     suspend fun getBookChapters(rssUrl:String):Flow<Resource<List<Chapter>>>
+
+    fun searchBooks(query:String):Flow<List<Book>>
 }

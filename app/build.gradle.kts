@@ -79,5 +79,6 @@ dependencies {
     implementation(libs.hilt.navigation)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
+    implementation(project(":feature:search"))
 
 }

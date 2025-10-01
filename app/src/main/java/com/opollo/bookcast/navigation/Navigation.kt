@@ -21,6 +21,8 @@ sealed class NavigationGraph: NavKey{
     @Serializable
     data object Profile: NavigationGraph()
     @Serializable
+    data object Search: NavigationGraph()
+    @Serializable
     data class Details(val book: Book): NavigationGraph()
     @Serializable
     data class GenreList(val genre:String): NavigationGraph()
