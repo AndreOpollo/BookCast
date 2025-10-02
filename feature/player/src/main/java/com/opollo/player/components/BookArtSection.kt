@@ -1,5 +1,6 @@
 package com.opollo.player.components
 
+import android.R.attr.contentDescription
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,9 +11,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.opollo.player.R
+
 
 @Composable
 fun BookArtSection(
@@ -31,6 +35,7 @@ fun BookArtSection(
                 .data(coverArt ?: "")
                 .crossfade(true)
                 .build(),
+            placeholder = painterResource(R.drawable.placeholder),
             contentScale = ContentScale.Crop,
             contentDescription = "Book cover",
             modifier = Modifier.fillMaxSize()

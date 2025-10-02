@@ -17,8 +17,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -55,11 +58,11 @@ fun MiniPlayer(
                 .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
-        ){
+        ) {
             Row(
                 modifier = Modifier.weight(1f),
                 verticalAlignment = Alignment.CenterVertically
-            ){
+            ) {
                 Card(
                     modifier = Modifier.size(48.dp),
                     shape = MaterialTheme.shapes.small
@@ -70,31 +73,61 @@ fun MiniPlayer(
                             .crossfade(true)
                             .build(),
                         contentScale = ContentScale.Crop,
+                        placeholder = painterResource(com.opollo.player.R.drawable.placeholder),
                         contentDescription = "Book Cover",
                         modifier = Modifier.fillMaxSize()
                     )
                 }
                 Spacer(modifier.width(12.dp))
-                Column(modifier = Modifier.weight(1f)){
-                    Text(state.currentChapter?.title?:"",
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        state.currentChapter?.title ?: "",
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis)
-                    Text(state.currentBook?.title?:"",
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        state.currentBook?.title ?: "",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis)
+                        overflow = TextOverflow.Ellipsis
+                    )
                 }
             }
-            IconButton(onClick = {viewModel.onEvent(PlayerEvent.PlayPause,context)}) {
-                val icon = if(state.isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow
-                Icon(icon,
-                    contentDescription = "Play/Pause",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(28.dp))
+
+            Box(modifier = Modifier.size(48.dp),
+                contentAlignment = Alignment.Center){
+                if(state.isLoading || state.isBuffering){
+                    CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                } else {
+                    IconButton(onClick = { viewModel.onEvent(PlayerEvent.PlayPause, context) }) {
+                        val icon =
+                            if (state.isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow
+                        Icon(
+                            icon,
+                            contentDescription = "Play/Pause",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(28.dp)
+                        )
+                    }
+                }
+
             }
         }
+        LinearProgressIndicator(
+            progress = {
+                if(state.currentDuration>0){
+                    state.playbackPosition.toFloat()/state.currentDuration
+                }else{
+                    0f
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(2.dp)
+                .align(Alignment.BottomCenter)
+        )
     }
 }

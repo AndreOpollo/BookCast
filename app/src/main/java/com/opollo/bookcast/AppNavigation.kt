@@ -66,10 +66,10 @@ fun AppNavigation(viewModel: PlayerViewModel = hiltViewModel()){
 
     val scaffoldState = rememberBottomSheetScaffoldState()
     val scope = rememberCoroutineScope()
-    var isPlayerVisible  = state.currentBook != null
+    val isPlayerVisible  = state.currentBook != null
 
-    LaunchedEffect(scaffoldState.bottomSheetState.currentValue) {
-        Log.d("SheetDebug", "State: ${scaffoldState.bottomSheetState.currentValue}")
+    LaunchedEffect(isPlayerVisible) {
+        Log.d("PlayerVisible", "State: ${state.currentBook}")
     }
 
     val currentBackStack = when(currentTab){
@@ -131,7 +131,7 @@ fun AppNavigation(viewModel: PlayerViewModel = hiltViewModel()){
             },
             sheetShape = RectangleShape,
             sheetDragHandle = {},
-            sheetPeekHeight = if(isPlayerVisible)innerPadding.calculateBottomPadding() +  70.dp else 0.dp,
+            sheetPeekHeight = if(isPlayerVisible)innerPadding.calculateBottomPadding() +  72.dp else 0.dp,
         ) {
             NavDisplay(
                 modifier = Modifier
@@ -170,10 +170,7 @@ fun AppNavigation(viewModel: PlayerViewModel = hiltViewModel()){
                         DetailsScreen(
                             entry.book,
                             onBackPressed = { currentBackStack.removeLastOrNull() },
-                            onPlayClicked = {
-                                isPlayerVisible = true
-                                scope.launch { scaffoldState.bottomSheetState.partialExpand() }
-                            })
+                            playerViewModel = viewModel)
                     }
                     entry<NavigationGraph.GenreList> { entry ->
                         GenreListScreen(genre = entry.genre, onBackClick = {

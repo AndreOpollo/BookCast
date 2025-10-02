@@ -59,6 +59,7 @@ fun BookCard(book: Book,
     ){
         AsyncImage(model = ImageRequest.Builder(LocalContext.current)
             .data(book.coverArt)
+            .placeholder(R.drawable.placeholder)
             .crossfade(true)
             .build(),
             contentDescription = book.title,
@@ -122,7 +123,8 @@ fun CurrentlyReadingBookCard(
             ) {
                 AsyncImage(
                     model = progress.book.coverArt,
-                    contentDescription = "Cover of ${progress.book?.title}",
+                    contentDescription = "Cover of ${progress.book.title}",
+                    placeholder = painterResource(R.drawable.placeholder),
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )

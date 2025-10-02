@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "com.opollo.player"
+    namespace = "com.opollo.player.core"
     compileSdk = 36
 
     defaultConfig {

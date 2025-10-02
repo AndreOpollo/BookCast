@@ -75,20 +75,19 @@ import com.opollo.player.presentation.PlayerViewModel
 fun DetailsScreen(book: Book,
                   onBackPressed:()->Unit,
                   viewModel: DetailsViewModel = hiltViewModel(),
-                  playerViewModel: PlayerViewModel = hiltViewModel(),
-                  onPlayClicked:()->Unit
+                  playerViewModel: PlayerViewModel,
 ){
     var isFavorite by remember { mutableStateOf(false) }
     var selectedTab by remember { mutableStateOf("Overview") }
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
+    val playerState by playerViewModel.uiState.collectAsState()
+
 
     LaunchedEffect(book.urlRss) {
         if(book.urlRss.isNotEmpty()){
             viewModel.getBookChapters(book.urlRss)
         }
-
-        Log.d("DetailsScreen","${playerViewModel.uiState.value}")
 
     }
     LaunchedEffect(Unit){
@@ -131,6 +130,7 @@ fun DetailsScreen(book: Book,
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
                         .data(book.coverArt)
+                        .placeholder(R.drawable.placeholder)
                         .crossfade(true)
                         .build(),
                     contentDescription = "Book Cover",
@@ -187,20 +187,21 @@ fun DetailsScreen(book: Book,
                             }
                         }
                         Button(onClick = {
+
                             if(state.chapters.isNotEmpty()){
-                                onPlayClicked()
                                 playerViewModel.onEvent(
                                     PlayerEvent.LoadBook(book,state.chapters),
                                     context
                                 )
-                                playerViewModel.onEvent(PlayerEvent.PlayChapter(0),context)
                             }
-                        }, modifier = Modifier.weight(1f)) {
+                        }, modifier = Modifier.weight(1f),
+                            enabled = state.chapters.isNotEmpty()) {
+
                                 Icon(Icons.Default.PlayArrow,
                                     "Play Book",
                                     modifier = Modifier.size(ButtonDefaults.IconSize))
                                 Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
-                                Text("Play",
+                                Text(if(state.chapters.isEmpty()) "Loading..." else "Play",
                                     style = MaterialTheme.typography.labelLarge)
 
                         }
@@ -277,6 +278,10 @@ fun ChapterList(chapters:List<Chapter>){
 @Composable
 fun ChapterItem(chapter: Chapter,
                 onClick: () -> Unit){
+    LaunchedEffect(Unit) {
+        Log.d("Chapter Duration", chapter.duration)
+        Log.d("Formated Chapter Duration",formatChapterDuration(chapter.duration))
+    }
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -308,7 +313,7 @@ fun ChapterItem(chapter: Chapter,
                 text = chapter.title,
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onBackground,
-                maxLines = 2
+                maxLines = 1
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
@@ -340,12 +345,16 @@ fun TabButton(text:String,isSelected:Boolean,onClick:()->Unit){
 }
 
 private fun formatTotalTime(time:String):String{
-    val parts = time.split(":")
+    val parts = time.trim().split(":")
 
     if(parts.size<2) return time
 
     return when(parts.size){
-        3->"${parts[0]}h ${parts[1]}m"
+        3->{
+            val hours = parts[0].toIntOrNull() ?: 0
+            if(hours>0) "${parts[0]}h ${parts[1]}m"
+            else "${parts[1]}m"
+        }
         2->"${parts[0]}h ${parts[1]}m"
         else -> time
     }
@@ -354,13 +363,23 @@ private fun formatTotalTime(time:String):String{
 
 private fun formatChapterDuration(duration:String):String{
 
-    val parts = duration.split(":")
+    val parts = duration.trim().split(":")
 
     if(parts.size<2) return duration
 
     return when(parts.size){
-        3->"${parts[1]}m ${parts[2]}s"
-        2->"${parts[0]}m ${parts[1]}s"
+        3->{
+            val hours = parts[0].toIntOrNull() ?: 0
+            val mins = parts[1].toIntOrNull() ?: 0
+            if(hours > 0) "${parts[0]}h ${parts[1]}m ${parts[2]}s"
+            else if(mins>0)"${parts[1]}m ${parts[2]}s"
+            else "${parts[2]}s"
+        }
+        2->{
+            val mins = parts[0].toIntOrNull() ?: 0
+            if(mins > 0) "${parts[0].trim()}m ${parts[1].trim()}s"
+            else "${parts[2]}s"
+        }
         else -> duration
     }
 

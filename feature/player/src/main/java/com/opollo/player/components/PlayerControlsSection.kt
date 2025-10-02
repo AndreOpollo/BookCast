@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -27,6 +28,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun PlayerControlsSection(
     isPlaying: Boolean,
+    isBuffering:Boolean,
     onPrevious:()->Unit,
     onPlayPause:()->Unit,
     onNext:()->Unit,
@@ -55,6 +57,10 @@ fun PlayerControlsSection(
                 modifier = Modifier.size(32.dp)
             )
         }
+
+        if(isBuffering){
+            CircularProgressIndicator()
+        } else{
         Card(
             modifier = Modifier.size(80.dp),
             shape = CircleShape,
@@ -62,15 +68,18 @@ fun PlayerControlsSection(
                 containerColor = MaterialTheme.colorScheme.primary
             ),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-        ){
-            IconButton(onPlayPause,
-                modifier = Modifier.fillMaxSize()) {
+        ) {
+            IconButton(
+                onPlayPause,
+                modifier = Modifier.fillMaxSize()
+            ) {
                 Icon(
-                    imageVector = if(isPlaying)Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                    imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
                     contentDescription = "Play/Pause",
                     tint = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.size(40.dp)
                 )
+                }
             }
         }
         IconButton(onNext, modifier = Modifier.size(48.dp)) {

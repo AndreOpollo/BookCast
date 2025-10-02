@@ -92,6 +92,7 @@ fun FullScreenPlayer(
 
         Spacer(modifier = Modifier.height(24.dp))
         PlayerControlsSection(
+            isBuffering = state.isBuffering,
             isPlaying = state.isPlaying,
             onPrevious = { viewModel.onEvent(PlayerEvent.PlayPrevious,context) },
             onPlayPause = { viewModel.onEvent(PlayerEvent.PlayPause,context) },

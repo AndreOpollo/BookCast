@@ -14,6 +14,7 @@ data class PlayerUiState(
     val playbackSpeed:Float = 1.0f,
     val errorMsg:String? = null,
     val isLoading:Boolean = false,
+    val isBuffering:Boolean = false,
     val currentDuration:Long = 0L
 
 

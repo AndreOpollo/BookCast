@@ -62,6 +62,12 @@ class PlayerViewModel @Inject constructor(
                 }
             }
 
+            override fun onPlaybackStateChanged(playbackState: Int) {
+                _uiState.update {
+                    it.copy(isBuffering = playbackState == Player.STATE_BUFFERING)
+                }
+            }
+
             override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
                 super.onMediaItemTransition(mediaItem, reason)
                 if(mediaItem == null) return
@@ -84,7 +90,9 @@ class PlayerViewModel @Inject constructor(
     fun onEvent(e: PlayerEvent,context: Context? = null){
         when(e){
             is PlayerEvent.ChangePlaybackSpeed -> changeSpeed(e.speed)
-            is PlayerEvent.LoadBook -> loadBook(e.book,e.chapters,context!!)
+            is PlayerEvent.LoadBook ->{
+                Log.d("LoadBook","Triggered")
+                loadBook(e.book,e.chapters,context!!)}
             is PlayerEvent.PlayChapter -> playChapter(e.index,context!!)
             PlayerEvent.PlayNext -> skipChapter(1,context!!)
             PlayerEvent.PlayPause -> togglePlayPause()
@@ -133,6 +141,7 @@ class PlayerViewModel @Inject constructor(
         )
 
         player.prepare()
+        Log.d("PlayerViewModel", "Loading")
         viewModelScope.launch {
             val savedProgress = repository.listenToReadingProgress(book.id).first()
             when (savedProgress) {
