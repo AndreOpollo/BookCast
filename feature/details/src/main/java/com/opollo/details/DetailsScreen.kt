@@ -2,6 +2,10 @@ package com.opollo.details
 
 import android.util.Log
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -46,6 +50,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -71,17 +76,20 @@ import com.opollo.domain.model.Chapter
 import com.opollo.player.presentation.PlayerEvent
 import com.opollo.player.presentation.PlayerViewModel
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun DetailsScreen(book: Book,
                   onBackPressed:()->Unit,
                   viewModel: DetailsViewModel = hiltViewModel(),
                   playerViewModel: PlayerViewModel,
 ){
-    var isFavorite by remember { mutableStateOf(false) }
+
     var selectedTab by remember { mutableStateOf("Overview") }
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
-    val playerState by playerViewModel.uiState.collectAsState()
+
+    val isFavorite by viewModel.isFavorite(book.id).collectAsState(initial = false)
+
 
 
     LaunchedEffect(book.urlRss) {
@@ -112,7 +120,7 @@ fun DetailsScreen(book: Book,
                             tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
-                    IconButton(onClick = { isFavorite = !isFavorite }) {
+                    IconButton(onClick = { viewModel.toggleFavorite(book.id,isFavorite) }) {
                         val icon =
                             if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder
                         val tint =
@@ -127,33 +135,36 @@ fun DetailsScreen(book: Book,
                 .padding(horizontal = 24.dp, vertical = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally){
 
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(book.coverArt)
-                        .placeholder(R.drawable.placeholder)
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = "Book Cover",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .width(200.dp)
-                        .aspectRatio(3f / 4f)
-                        .clip(MaterialTheme.shapes.medium)
-                )
-                Spacer(modifier = Modifier.height(24.dp))
-                Text(
-                    text = book.title,
-                    style = MaterialTheme.typography.displayLarge,
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = book.authors.joinToString(separator = ", "){"${it.firstName} ${it.lastName}"}.trim(),
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center
-                )
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(book.coverArt)
+                            .placeholder(R.drawable.placeholder)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = "Book Cover",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .width(200.dp)
+                            .aspectRatio(3f / 4f)
+                            .clip(MaterialTheme.shapes.medium)
+
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Text(
+                        text = book.title,
+                        style = MaterialTheme.typography.displayLarge,
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onBackground,
+
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = book.authors.joinToString(separator = ", ") { "${it.firstName} ${it.lastName}" }
+                            .trim(),
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                    )
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(
                     verticalAlignment = Alignment.CenterVertically,

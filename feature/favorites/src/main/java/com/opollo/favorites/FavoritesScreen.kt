@@ -1,5 +1,6 @@
 package com.opollo.favorites
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,7 +27,10 @@ fun FavoritesScreen(
 ){
     val state by viewModel.uiState.collectAsState()
 
-
+    LaunchedEffect(state.favoriteBooks) {
+        viewModel.loadFavoriteBooks()
+        Log.d("Favorites books","${state.favoriteBooks}")
+    }
     Column(
         modifier = modifier
             .fillMaxSize()

@@ -1,5 +1,6 @@
 package com.opollo.data.repository
 
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -35,9 +36,12 @@ class FavoritesRepositoryImpl @Inject constructor(
                         "bookId" to bookId,
                         "timeStamp" to System.currentTimeMillis()
                     )).await()
+                Log.d("FavoriteRepository-addFavorite",bookId)
+
 
                 Resource.Success(Unit)
             }catch (e: Exception){
+                Log.d("FavoriteRepository-addFavorite",e.message.toString())
                 Resource.Error(e)
             }
         }
@@ -54,10 +58,12 @@ class FavoritesRepositoryImpl @Inject constructor(
                     .document(bookId)
                     .delete()
                     .await()
+                Log.d("FavoriteRepository-removeFavorite",bookId)
 
                 Resource.Success(Unit)
 
             }catch (e:Exception){
+                Log.d("FavoriteRepository-removeFavorite",e.message.toString())
                 Resource.Error(e)
             }
         }
@@ -75,7 +81,7 @@ class FavoritesRepositoryImpl @Inject constructor(
                     trySend(Resource.Loading)
 
                     val listener = getUserFavoritesRef()
-                        .orderBy("timestamp", Query.Direction.ASCENDING)
+                        .orderBy("timeStamp", Query.Direction.ASCENDING)
                         .addSnapshotListener {
                             snapshot,error->
                             if(error!=null){
@@ -122,6 +128,8 @@ class FavoritesRepositoryImpl @Inject constructor(
                     awaitClose {
                         listener.remove()
                     }
+                    Log.d("Favorite Repository",bookId)
+
                 }catch (e: Exception){
                     trySend(false)
                     close()

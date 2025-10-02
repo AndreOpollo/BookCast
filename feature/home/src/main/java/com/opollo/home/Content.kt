@@ -1,6 +1,10 @@
 package com.opollo.home
 
 import android.util.Log
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,10 +16,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.opollo.domain.model.Book
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun Content(modifier: Modifier = Modifier,
             uiState: HomeUiState,
-            onBookClicked:(Book)->Unit){
+            onBookClicked:(Book)->Unit, ){
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -27,22 +32,19 @@ fun Content(modifier: Modifier = Modifier,
             BookSection(
                 title = "Continue Reading",
                 currentlyReadingBooks = uiState.currentlyReadingBookList,
-                onBookClicked = onBookClicked
-            )
+                onBookClicked = onBookClicked)
         }
         item {
             BookSection(
                 title = "Recommended For You",
                 books = uiState.recommendedList,
-                onBookClicked = onBookClicked
-            )
+                onBookClicked = onBookClicked)
         }
         item{
             BookSection(
                 title = "New Releases",
                 books = uiState.recommendedList,
-                onBookClicked = onBookClicked
-            )
+                onBookClicked = onBookClicked)
         }
 
     }

@@ -18,6 +18,8 @@ import androidx.compose.material.icons.filled.Security
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -48,6 +50,9 @@ fun ProfileSettingsScreen(
     onAbout: () -> Unit = {},
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
+    val isGuest by viewModel.isAnonymous.collectAsState()
+    val email by viewModel.userEmail.collectAsState()
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -58,7 +63,9 @@ fun ProfileSettingsScreen(
         item {
             UserProfileHeader(
                 userProfile = userProfile,
-                onEditProfile = onEditProfile
+                onEditProfile = onEditProfile,
+                isGuest = isGuest,
+                email = email
             )
         }
         item {

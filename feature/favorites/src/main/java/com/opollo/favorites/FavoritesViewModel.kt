@@ -1,5 +1,6 @@
 package com.opollo.favorites
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.opollo.domain.model.Book
@@ -31,13 +32,14 @@ class FavoritesViewModel @Inject constructor(
     }
 
 
-    private fun loadFavoriteBooks(){
+    fun loadFavoriteBooks(){
         _uiState.update {
             it.copy(isLoading = true, errorMsg = null)
         }
         viewModelScope.launch {
             favoritesRepository.getFavoriteBookIds().collectLatest {
                 result->
+                Log.d("Favorites Viewmodel","$result")
                 when(result) {
                     is Resource.Error<*> -> {
                         _uiState.update {

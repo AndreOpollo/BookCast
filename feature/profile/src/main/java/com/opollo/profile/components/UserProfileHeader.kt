@@ -20,13 +20,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun UserProfileHeader(
     userProfile: UserProfile,
+    email:String,
+    isGuest:Boolean,
     onEditProfile: () -> Unit
 ) {
+    val username = email.split("@")[0]
+    val capitalized = username.replaceFirstChar {
+        if(it.isLowerCase()) it.titlecase() else it.toString()
+    }
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
@@ -47,7 +54,7 @@ fun UserProfileHeader(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = userProfile.initials,
+                    text = if (isGuest) "GU" else email.take(2).uppercase(),
                     style = MaterialTheme.typography.headlineLarge,
                     color = MaterialTheme.colorScheme.onPrimary
                 )
@@ -56,13 +63,13 @@ fun UserProfileHeader(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = userProfile.name,
+                text = if(isGuest) "Guest" else capitalized,
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.onSurface
             )
 
             Text(
-                text = userProfile.email,
+                text = if(isGuest)"Guest Account" else email,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

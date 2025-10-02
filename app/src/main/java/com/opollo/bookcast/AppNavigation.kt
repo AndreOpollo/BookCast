@@ -1,6 +1,9 @@
 package com.opollo.bookcast
 
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -51,7 +54,7 @@ import kotlinx.coroutines.launch
 
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun AppNavigation(viewModel: PlayerViewModel = hiltViewModel()){
     val homeBackStack = rememberNavBackStack(NavigationGraph.Home)
@@ -125,64 +128,80 @@ fun AppNavigation(viewModel: PlayerViewModel = hiltViewModel()){
             scaffoldState = scaffoldState,
             sheetContent = {
                 when (scaffoldState.bottomSheetState.currentValue) {
-                    SheetValue.Hidden -> { Spacer(modifier = Modifier.height(1.dp)) }
-                    SheetValue.Expanded -> { FullScreenPlayer() }
-                    SheetValue.PartiallyExpanded -> { MiniPlayer(onExpand = { scope.launch { scaffoldState.bottomSheetState.expand() } }) } }
+                    SheetValue.Hidden -> {
+                        Spacer(modifier = Modifier.height(1.dp))
+                    }
+
+                    SheetValue.Expanded -> {
+                        FullScreenPlayer()
+                    }
+
+                    SheetValue.PartiallyExpanded -> {
+                        MiniPlayer(onExpand = { scope.launch { scaffoldState.bottomSheetState.expand() } })
+                    }
+                }
             },
             sheetShape = RectangleShape,
             sheetDragHandle = {},
-            sheetPeekHeight = if(isPlayerVisible)innerPadding.calculateBottomPadding() +  72.dp else 0.dp,
+            sheetPeekHeight = if (isPlayerVisible) innerPadding.calculateBottomPadding() + 72.dp else 0.dp,
         ) {
-            NavDisplay(
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .padding(bottom = if(isPlayerVisible)70.dp else 0.dp),
-                backStack = currentBackStack,
-                onBack = { currentBackStack.removeLastOrNull() },
-                entryProvider = entryProvider {
-                    entry<NavigationGraph.Home> {
-                        HomeScreen(onBookClicked = { book ->
-                            homeBackStack.add(NavigationGraph.Details(book))
-                        })
-                    }
-                    entry<NavigationGraph.Discover> {
-                        DiscoverScreen(onSearchClick = {
-                            discoverBackStack.add(NavigationGraph.Search)
-                        }, onGenreClicked = { genre ->
-                            discoverBackStack.add(NavigationGraph.GenreList(genre))
-                        })
-                    }
-                    entry<NavigationGraph.Favorites> {
-                        FavoritesScreen(onBookClick = {
-                        })
-                    }
-                    entry<NavigationGraph.Profile> {
-                        ProfileSettingsScreen()
-                    }
-                    entry<NavigationGraph.Search>{
-                        SearchScreen(onBookClick = {
-                            book->
-                            currentBackStack.add(NavigationGraph.Details(book))
-                        },
-                        onBackClick = {currentBackStack.removeLastOrNull()} )
-                    }
-                    entry<NavigationGraph.Details> { entry ->
-                        DetailsScreen(
-                            entry.book,
-                            onBackPressed = { currentBackStack.removeLastOrNull() },
-                            playerViewModel = viewModel)
-                    }
-                    entry<NavigationGraph.GenreList> { entry ->
-                        GenreListScreen(genre = entry.genre, onBackClick = {
-                            currentBackStack.removeLastOrNull()
-                        },
-                            onBookClick = {book->
-                                currentBackStack.add(NavigationGraph.Details(book))
-                            },
-                            onFavoriteToggle = {})
-                    }
-                },
-            )
+            SharedTransitionLayout {
+                NavDisplay(
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .padding(bottom = if (isPlayerVisible) 70.dp else 0.dp),
+                    backStack = currentBackStack,
+                    onBack = { currentBackStack.removeLastOrNull() },
+                    entryProvider = entryProvider {
+                        entry<NavigationGraph.Home> {
+                                HomeScreen(
+                                    onBookClicked = { book ->
+                                        homeBackStack.add(NavigationGraph.Details(book))
+                                    },
+                                )
+
+                        }
+                        entry<NavigationGraph.Discover> {
+                            DiscoverScreen(onSearchClick = {
+                                discoverBackStack.add(NavigationGraph.Search)
+                            }, onGenreClicked = { genre ->
+                                discoverBackStack.add(NavigationGraph.GenreList(genre))
+                            })
+                        }
+                        entry<NavigationGraph.Favorites> {
+                            FavoritesScreen(onBookClick = {
+                            })
+                        }
+                        entry<NavigationGraph.Profile> {
+                            ProfileSettingsScreen()
+                        }
+                        entry<NavigationGraph.Search> {
+                            SearchScreen(
+                                onBookClick = { book ->
+                                    currentBackStack.add(NavigationGraph.Details(book))
+                                },
+                                onBackClick = { currentBackStack.removeLastOrNull() })
+                        }
+                        entry<NavigationGraph.Details> { entry ->
+                                DetailsScreen(
+                                    entry.book,
+                                    onBackPressed = { currentBackStack.removeLastOrNull() },
+                                    playerViewModel = viewModel,
+                                )
+                        }
+                        entry<NavigationGraph.GenreList> { entry ->
+                            GenreListScreen(
+                                genre = entry.genre, onBackClick = {
+                                    currentBackStack.removeLastOrNull()
+                                },
+                                onBookClick = { book ->
+                                    currentBackStack.add(NavigationGraph.Details(book))
+                                },
+                                onFavoriteToggle = {})
+                        }
+                    },
+                )
+            }
         }
     }
 }

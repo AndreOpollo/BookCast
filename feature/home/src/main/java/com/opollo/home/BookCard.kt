@@ -1,6 +1,10 @@
 package com.opollo.home
 
 
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -50,45 +54,49 @@ import coil.request.ImageRequest
 import com.opollo.domain.model.Book
 import com.opollo.domain.model.ReadingProgress
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun BookCard(book: Book,
              modifier: Modifier = Modifier,
-             onBookClicked:(Book)->Unit){
+             onBookClicked:(Book)->Unit, ){
     Column(
         modifier = modifier.width(140.dp)
-    ){
-        AsyncImage(model = ImageRequest.Builder(LocalContext.current)
-            .data(book.coverArt)
-            .placeholder(R.drawable.placeholder)
-            .crossfade(true)
-            .build(),
-            contentDescription = book.title,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxWidth()
-                .aspectRatio(3f/4f)
-                .clip(MaterialTheme.shapes.medium)
-                .clickable(onClick = {onBookClicked(book)})
+    ) {
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(book.coverArt)
+                    .placeholder(R.drawable.placeholder)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = book.title,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxWidth()
+                    .aspectRatio(3f / 4f)
+                    .clip(MaterialTheme.shapes.medium)
+                    .clickable(onClick = { onBookClicked(book) })
             )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = book.title,
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.SemiBold,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = book.authors.firstOrNull()?.let { author ->
-                "${author.firstName} ${author.lastName}".trim()
-            } ?: "Unknown Author",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.fillMaxWidth()
-        )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = book.title,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.fillMaxWidth()
+
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = book.authors.firstOrNull()?.let { author ->
+                    "${author.firstName} ${author.lastName}".trim()
+                } ?: "Unknown Author",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.fillMaxWidth()
+
+            )
     }
 }
 
@@ -203,7 +211,7 @@ fun CurrentlyReadingBookCard(
                 text = progress.book.title,
                 style = MaterialTheme.typography.titleLarge.copy(fontSize = 14.sp),
                 color = MaterialTheme.colorScheme.onSurface,
-                maxLines = 2,
+                maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
 
@@ -242,13 +250,14 @@ fun CurrentlyReadingBookCard(
     }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun BookSection(
     modifier: Modifier = Modifier,
     title:String,
     books:List<Book> = emptyList(),
     currentlyReadingBooks:List<ReadingProgress> = emptyList(),
-    onBookClicked: (Book) -> Unit
+    onBookClicked: (Book) -> Unit,
 ){
     val hasContent = books.isNotEmpty()|| currentlyReadingBooks.isNotEmpty()
     if(hasContent) {
