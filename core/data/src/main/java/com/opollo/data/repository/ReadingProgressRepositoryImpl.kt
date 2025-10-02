@@ -6,6 +6,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.snapshots
 import com.opollo.domain.model.ReadingProgress
@@ -89,8 +90,6 @@ class ReadingProgressRepositoryImpl(
             val authListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
                 val newUserId = firebaseAuth.currentUser?.uid
                 Log.d("AuthListener", "Auth changed: $newUserId")
-
-                // Remove old listener
                 listenerRegistration?.remove()
                 listenerRegistration = null
 
@@ -100,6 +99,7 @@ class ReadingProgressRepositoryImpl(
                     val colRef = firestore.collection(USERS_COLLECTION)
                         .document(newUserId)
                         .collection(PROGRESS_SUBCOLLECTION)
+                        .orderBy("lastReadTimestamp", Query.Direction.DESCENDING)
 
                     listenerRegistration = colRef.addSnapshotListener { snapshot, error ->
                         if (error != null) {
