@@ -110,7 +110,7 @@ fun sampleReadingProgress(): List<ReadingProgress> {
             progressPercentage = 0.35f,
             timeRemaining = "2h 58m left",
             isFavorite = true,
-            lastReadTime = "2 hours ago"
+            lastReadTimestamp = 0
         ),
         ReadingProgress(
             book = Book(
@@ -132,7 +132,7 @@ fun sampleReadingProgress(): List<ReadingProgress> {
             progressPercentage = 0.68f,
             timeRemaining = "3h 56m left",
             isFavorite = false,
-            lastReadTime = "1 day ago"
+            lastReadTimestamp = 0
         )
     )
 }

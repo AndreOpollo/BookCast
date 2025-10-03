@@ -205,7 +205,7 @@ fun CurrentlyReadingCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Last read ${progress.lastReadTime}",
+                text = "Last read ${progress.lastReadTimestamp}",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
             )

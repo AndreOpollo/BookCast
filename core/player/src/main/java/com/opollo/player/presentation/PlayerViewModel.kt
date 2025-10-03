@@ -52,8 +52,6 @@ class PlayerViewModel @Inject constructor(
     private val SAVE_INTERVAL_MILLIS = 15_000L
 
     init {
-
-
         player.addListener(object: Player.Listener{
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 _uiState.update { it.copy(isPlaying = isPlaying) }
@@ -95,7 +93,7 @@ class PlayerViewModel @Inject constructor(
                 loadBook(e.book,e.chapters,context!!)}
             is PlayerEvent.PlayChapter -> playChapter(e.index,context!!)
             PlayerEvent.PlayNext -> skipChapter(1,context!!)
-            PlayerEvent.PlayPause -> togglePlayPause()
+            PlayerEvent.PlayPause -> togglePlayPause(context!!)
             PlayerEvent.PlayPrevious -> skipChapter(-1,context!!)
             is PlayerEvent.SeekTo -> seekTo(e.position)
             PlayerEvent.Stop -> stop()
@@ -144,6 +142,7 @@ class PlayerViewModel @Inject constructor(
         Log.d("PlayerViewModel", "Loading")
         viewModelScope.launch {
             val savedProgress = repository.listenToReadingProgress(book.id).first()
+            Log.d("PlayerViewModel", "$savedProgress")
             when (savedProgress) {
                 is Resource.Success -> {
                     val savedProgress = savedProgress.data
@@ -154,13 +153,11 @@ class PlayerViewModel @Inject constructor(
                     _uiState.update { it.copy(isLoading = false) }
                 }
                 is Resource.Error -> {
-                    // fallback if no saved progress or error occurred
                     Log.w("PlayerViewModel", "No saved progress: ${savedProgress.throwable?.message}")
                     playChapter(0, context)
                     _uiState.update { it.copy(isLoading = false) }
                 }
                 null -> {
-                    // flow never emitted, just play from beginning
                     playChapter(0, context)
                     _uiState.update { it.copy(isLoading = false) }
                 }
@@ -189,9 +186,21 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-    private fun togglePlayPause(){
+    private fun togglePlayPause(context: Context){
         val isPlaying = player.isPlaying
-        if(isPlaying) player.pause() else player.play()
+        if(isPlaying) {
+            player.pause()
+        }else {
+            startService(context)
+            if (player.playbackState == Player.STATE_IDLE) {
+                val currentIndex = _uiState.value.currentChapterIndex
+                val currentPosition = _uiState.value.playbackPosition
+
+                player.prepare()
+                player.seekTo(currentIndex, currentPosition)
+            }
+            player.play()
+        }
     }
 
     private fun skipChapter(offset:Int,context: Context){
@@ -247,7 +256,6 @@ class PlayerViewModel @Inject constructor(
             }
             val elapsedMillis = completedChaptersDuration + player.currentPosition
 
-            // Calculate percentage
             val progressPercentage = if (totalDurationMillis > 0) {
                 ((elapsedMillis.toFloat() / totalDurationMillis) * 100).coerceIn(0f, 100f)
             } else {
@@ -290,13 +298,12 @@ class PlayerViewModel @Inject constructor(
         player.stop()
         player.clearMediaItems()
         _uiState.update {
-            PlayerUiState()
+            it.copy(currentBook = null)
         }
         progressJob?.cancel()
     }
     override fun onCleared() {
         super.onCleared()
-        player.release()
     }
 
     private fun formatTimeRemaining(millis: Long): String {
@@ -316,7 +323,6 @@ class PlayerViewModel @Inject constructor(
 
             when (parts.size) {
                 3 -> {
-                    // Format: HH:MM:SS
                     val hours = parts[0].toLongOrNull() ?: 0L
                     val minutes = parts[1].toLongOrNull() ?: 0L
                     val seconds = parts[2].toLongOrNull() ?: 0L
@@ -326,7 +332,6 @@ class PlayerViewModel @Inject constructor(
                             TimeUnit.SECONDS.toMillis(seconds)
                 }
                 2 -> {
-                    // Format: MM:SS
                     val minutes = parts[0].toLongOrNull() ?: 0L
                     val seconds = parts[1].toLongOrNull() ?: 0L
 
@@ -334,7 +339,6 @@ class PlayerViewModel @Inject constructor(
                             TimeUnit.SECONDS.toMillis(seconds)
                 }
                 1 -> {
-                    // Format: SS (seconds only)
                     val seconds = parts[0].toLongOrNull() ?: 0L
                     TimeUnit.SECONDS.toMillis(seconds)
                 }

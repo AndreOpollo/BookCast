@@ -1,6 +1,6 @@
 package com.opollo.player.components
 
-import android.R.attr.contentDescription
+
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth

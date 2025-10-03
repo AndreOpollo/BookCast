@@ -1,6 +1,6 @@
 package com.opollo.data.mappers
 
-import android.R.attr.description
+
 import com.opollo.data.local.entities.AuthorEntity
 import com.opollo.data.local.entities.BookEntity
 import com.opollo.data.local.entities.BookWithAuthors

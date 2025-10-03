@@ -18,10 +18,9 @@ val sampleGenres = listOf(
     Genre("Poetry", R.drawable.book_cover, Color(0xFF00ACC1)),
     Genre("Philosophy", R.drawable.book_cover, Color(0xFF3949AB)),
     Genre("Religion", R.drawable.book_cover, Color(0xFFFB8C00)),
-    Genre("Erotica", R.drawable.book_cover, Color(0xFFFB8C00)),
-    Genre("Plays", R.drawable.book_cover, Color(0xFFFB8C00)),
-    Genre("Sagas", R.drawable.book_cover, Color(0xFFFB8C00)),
-    Genre("Short Stories", R.drawable.book_cover, Color(0xFFFB8C00)),
+    Genre("Erotica", R.drawable.book_cover, Color(0xFFD81B60)),
+    Genre("Plays", R.drawable.book_cover, Color(0xFF43A047)),
+    Genre("Sagas", R.drawable.book_cover, Color(0xFFFF6F00)),
+    Genre("Short Stories", R.drawable.book_cover, Color(0xFF6D4C41)),
+)
 
-
-    )

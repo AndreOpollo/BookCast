@@ -36,6 +36,8 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -104,9 +106,10 @@ fun BookCard(book: Book,
 fun CurrentlyReadingBookCard(
     progress: ReadingProgress,
     onBookClick:(Book)->Unit,
-    onFavoriteClick:()->Unit,
-    onPlayClick:()->Unit
+    onPlayClick:()->Unit,
+    viewModel: HomeViewModel
 ){
+    val isFavorite by viewModel.isFavorite(progress.book.id).collectAsState(false)
     Card(
         modifier = Modifier
             .width(160.dp)
@@ -180,9 +183,9 @@ fun CurrentlyReadingBookCard(
                         )
                 ) {
                     Icon(
-                        imageVector = if (progress.isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                        contentDescription = if (progress.isFavorite) "Remove from favorites" else "Add to favorites",
-                        tint = if (progress.isFavorite) Color.Red else Color.White,
+                        imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                        contentDescription = if (isFavorite) "Remove from favorites" else "Add to favorites",
+                        tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(14.dp)
                     )
                 }
@@ -258,6 +261,7 @@ fun BookSection(
     books:List<Book> = emptyList(),
     currentlyReadingBooks:List<ReadingProgress> = emptyList(),
     onBookClicked: (Book) -> Unit,
+    viewModel: HomeViewModel
 ){
     val hasContent = books.isNotEmpty()|| currentlyReadingBooks.isNotEmpty()
     if(hasContent) {
@@ -277,8 +281,8 @@ fun BookSection(
                 CurrentlyReadingBookCard(
                     progress = currentlyReading,
                     onBookClick = {},
-                    onFavoriteClick = {},
-                    onPlayClick = {}
+                    onPlayClick = {},
+                    viewModel
                 )
             }
             items(books) { book ->

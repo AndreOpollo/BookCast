@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 
 
 @Composable
-fun UserStatsCard(userProfile: UserProfile) {
+fun UserStatsCard() {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
@@ -37,7 +37,7 @@ fun UserStatsCard(userProfile: UserProfile) {
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             StatItem(
-                value = userProfile.booksRead.toString(),
+                value = "0",
                 label = "Books Read"
             )
 
@@ -48,7 +48,7 @@ fun UserStatsCard(userProfile: UserProfile) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f)
             )
             StatItem(
-                value = "${userProfile.hoursListened}h",
+                value = "0h",
                 label = "Hours Listened"
             )
         }

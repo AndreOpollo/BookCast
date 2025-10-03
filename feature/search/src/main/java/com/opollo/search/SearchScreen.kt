@@ -123,7 +123,6 @@ fun SearchScreen(
             }
         }
 
-        // Content
         Box(modifier = Modifier.fillMaxSize()) {
             when {
                 isSearching -> {

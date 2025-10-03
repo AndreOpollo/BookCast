@@ -10,12 +10,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.opollo.domain.model.Book
+import com.opollo.genres.GenreViewModel
 
 @Composable
 fun BooksGrid(
     books: List<Book>,
     onBookClick: (Book) -> Unit,
-    onFavoriteToggle: (Book) -> Unit
+    onFavoriteToggle: (Book) -> Unit,
+    viewModel: GenreViewModel
 ) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 160.dp),
@@ -30,9 +32,9 @@ fun BooksGrid(
         ) { book ->
             GenreBookCard(
                 book = book,
-                isFavorite = true,
                 onCardClick = { onBookClick(book) },
-                onFavoriteToggle = { onFavoriteToggle(book) }
+                onFavoriteToggle = { onFavoriteToggle(book) },
+                viewModel = viewModel
             )
         }
     }

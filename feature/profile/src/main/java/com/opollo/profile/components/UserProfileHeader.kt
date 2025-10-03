@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun UserProfileHeader(
-    userProfile: UserProfile,
     email:String,
     isGuest:Boolean,
     onEditProfile: () -> Unit
@@ -74,7 +73,7 @@ fun UserProfileHeader(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            if (!userProfile.isGuest) {
+            if (!isGuest) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Surface(
                     shape = MaterialTheme.shapes.small,

@@ -27,10 +27,6 @@ fun FavoritesScreen(
 ){
     val state by viewModel.uiState.collectAsState()
 
-    LaunchedEffect(state.favoriteBooks) {
-        viewModel.loadFavoriteBooks()
-        Log.d("Favorites books","${state.favoriteBooks}")
-    }
     Column(
         modifier = modifier
             .fillMaxSize()

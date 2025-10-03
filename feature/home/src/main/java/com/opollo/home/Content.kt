@@ -1,26 +1,21 @@
 package com.opollo.home
 
-import android.util.Log
-import androidx.compose.animation.AnimatedContentScope
-import androidx.compose.animation.AnimatedVisibilityScope
-import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionScope
+
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.OutlinedTextFieldDefaults.contentPadding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.opollo.domain.model.Book
 
-@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun Content(modifier: Modifier = Modifier,
             uiState: HomeUiState,
-            onBookClicked:(Book)->Unit, ){
+            onBookClicked:(Book)->Unit,
+            viewModel: HomeViewModel){
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -32,20 +27,22 @@ fun Content(modifier: Modifier = Modifier,
             BookSection(
                 title = "Continue Reading",
                 currentlyReadingBooks = uiState.currentlyReadingBookList,
-                onBookClicked = onBookClicked)
+                onBookClicked = onBookClicked,
+                viewModel = viewModel )
         }
         item {
             BookSection(
                 title = "Recommended For You",
                 books = uiState.recommendedList,
-                onBookClicked = onBookClicked)
+                onBookClicked = onBookClicked,
+                viewModel = viewModel)
         }
         item{
             BookSection(
                 title = "New Releases",
-                books = uiState.recommendedList,
-                onBookClicked = onBookClicked)
+                books = uiState.recommendedList.reversed(),
+                onBookClicked = onBookClicked,
+                viewModel = viewModel)
         }
-
     }
 }

@@ -6,18 +6,22 @@ import androidx.lifecycle.viewModelScope
 import coil.util.CoilUtils.result
 import com.opollo.domain.model.Book
 import com.opollo.domain.repository.BookRepository
+import com.opollo.domain.repository.FavoritesRepository
 import com.opollo.domain.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class GenreViewModel @Inject constructor(
-    private val bookRepository: BookRepository
+    private val bookRepository: BookRepository,
+    private val favoritesRepository: FavoritesRepository
 ): ViewModel() {
 
     private val _uiState = MutableStateFlow(GenreListUiState())
@@ -57,6 +61,13 @@ class GenreViewModel @Inject constructor(
                 }
             }
 
+        }
+    }
+    fun isFavorite(bookId:String): Flow<Boolean> {
+        return flow {
+            favoritesRepository.isFavorite(bookId).collect { isFav ->
+                emit(isFav)
+            }
         }
     }
 }

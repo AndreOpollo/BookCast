@@ -34,12 +34,6 @@ import com.opollo.profile.components.UserStatsCard
 
 @Composable
 fun ProfileSettingsScreen(
-    userProfile: UserProfile = UserProfile(
-        name = "Guest User",
-        email = "Sign up to save your progress",
-        initials = "GU",
-        isGuest = true
-    ),
     onUpgrade: () -> Unit = {},
     onEditProfile: () -> Unit = {},
     onNotificationSettings: () -> Unit = {},
@@ -62,17 +56,16 @@ fun ProfileSettingsScreen(
     ) {
         item {
             UserProfileHeader(
-                userProfile = userProfile,
                 onEditProfile = onEditProfile,
                 isGuest = isGuest,
                 email = email
             )
         }
         item {
-            UserStatsCard(userProfile = userProfile)
+            UserStatsCard()
         }
 
-        if (userProfile.isGuest) {
+        if (isGuest) {
             item {
                 UpgradeCard(onUpgrade = onUpgrade)
             }

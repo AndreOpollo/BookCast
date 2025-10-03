@@ -95,5 +95,4 @@ fun SearchItem(
                 }
         }
     }
-
 }
