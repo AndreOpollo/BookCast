@@ -110,16 +110,19 @@ BookCast/
 ├── app/                    # Main application module
 ├── feature/
 │   ├── home/              # Home screen feature
-│   ├── discover/          # Discovery and search feature
-│   ├── favorites/         # Favorites management
+│   ├── discover/          # Discovery screen feature
+│   ├── favorites/         # Favorites screen management
 │   ├── player/            # Audio player feature
+│   ├── details/           # Book details feature
+│   ├── search/            # Search screen feature
+│   ├── genre/             # Genre-Lists screen feature
+│   ├── auth/              # Register and Login screen features
 │   └── profile/           # User profile feature
+
 ├── core/
-│   ├── data/              # Data layer (repositories, data sources)
-│   ├── domain/            # Domain models and use cases
-│   ├── network/           # Network module (Retrofit, API)
-│   ├── database/          # Local database (Room)
-│   └── ui/                # Shared UI components
+│   ├── data/              # Data layer (repositories, local and remote data sources,di)
+│   ├── domain/            # Domain models
+│   └── player/            # Shared Player management with exoplayer
 └── buildSrc/              # Dependency management
 ```
 
